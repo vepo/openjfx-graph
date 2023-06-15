@@ -2,6 +2,7 @@ package dev.vepo.openjgraph.graph;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.DisplayName;
@@ -22,8 +23,8 @@ public class DigraphTest {
     }
 
     @Test
-    @DisplayName("Create a simple graph without label in edge")
-    void simpleWithoutEdgeLabelTest() {
+    @DisplayName("It should test if two vertex are adjacentes")
+    void areAdjacentTest() {
         var graph = Digraph.<String, String>newDigraph();
         graph.insertVertex("A");
         graph.insertVertex("B");
@@ -36,5 +37,33 @@ public class DigraphTest {
         assertEquals(3, graph.numEdges(), "It should have 1 edge");
         assertTrue(graph.areAdjacent("A", "B"));
         assertFalse(graph.areAdjacent("B", "A"));
+    }
+
+    @Test
+    @DisplayName("It should avoid adding duplicated edge elements")
+    void duplicatedEdgeElementsTest() {
+        var graph = Digraph.<String, String>newDigraph();
+        graph.insertVertex("A");
+        graph.insertVertex("B");
+        graph.insertVertex("C");
+        graph.insertEdge("A", "B", "A - B");
+        assertThrows(InvalidEdgeException.class, () -> graph.insertEdge("B", "C", "A - B"));
+        assertThrows(InvalidVertexException.class, () -> graph.insertEdge("X", "C", "X- B"));
+        assertThrows(InvalidVertexException.class, () -> graph.insertEdge("B", "X", "B - X"));
+    }
+
+    @Test
+    @DisplayName("It should avoid adding duplicated edge")
+    void validateVertexTest() {
+        var graph = Digraph.<String, String>newDigraph();
+        graph.insertVertex("A");
+        graph.insertVertex("B");
+        graph.insertVertex("C");
+        assertThrows(InvalidVertexException.class, () -> graph.insertEdge("X", "C", "X- B"));
+        assertThrows(InvalidVertexException.class, () -> graph.insertEdge("B", "X", "B - X"));
+        assertThrows(InvalidVertexException.class, () -> graph.insertEdge(null, "X", "B - X"));
+        assertThrows(InvalidVertexException.class, () -> graph.insertEdge(new Vertex<>("X"), new Vertex<>("C"), "X- B"));
+        assertThrows(InvalidVertexException.class, () -> graph.insertEdge(new Vertex<>("B"), new Vertex<>("X"), "B - X"));
+        assertThrows(InvalidVertexException.class, () -> graph.insertEdge(null, new Vertex<>("X"), "B - X"));
     }
 }
