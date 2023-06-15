@@ -1,6 +1,7 @@
 package dev.vepo.openjgraph.graph;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -32,11 +33,58 @@ public class GraphTest {
         graph.insertEdge("B", "C", "B - C");
         graph.insertEdge("C", "A", "C - A");
 
-        assertEquals(3, graph.numVertices(), "It should have 2 vertices");
-        assertEquals(3, graph.numEdges(), "It should have 1 edge");
+        assertEquals(3, graph.numVertices(), "It should have 3 vertices");
+        assertEquals(3, graph.numEdges(), "It should have 3 edge");
         assertTrue(graph.areAdjacent("A", "B"));
         assertTrue(graph.areAdjacent("B", "A"));
     }
+
+    @Test
+    @DisplayName("It should test if one vertex can be removed")
+    void removeVertexTest() {
+        var graph = Graph.<String, String>newGraph();
+        graph.insertVertex("A");
+        graph.insertVertex("B");
+        graph.insertVertex("C");
+        graph.insertEdge("A", "B", "A - B");
+        graph.insertEdge("B", "C", "B - C");
+        graph.insertEdge("C", "A", "C - A");
+
+        assertEquals(3, graph.numVertices(), "It should have 3 vertices");
+        assertEquals(3, graph.numEdges(), "It should have 3 edge");
+        assertTrue(graph.areAdjacent("A", "B"));
+        assertTrue(graph.areAdjacent("B", "A"));
+
+        graph.removeVertex(new Vertex<String>("C"));
+
+        assertEquals(2, graph.numVertices(), "It should have 2 vertices");
+        assertEquals(1, graph.numEdges(), "It should have 1 edge");
+    }
+
+    @Test
+    @DisplayName("It should test if one edge can be removed")
+    void removeEdgeTest() {
+        var graph = Graph.<String, String>newGraph();
+        graph.insertVertex("A");
+        graph.insertVertex("B");
+        graph.insertVertex("C");
+        graph.insertEdge("A", "B", "A - B");
+        graph.insertEdge("B", "C", "B - C");
+        graph.insertEdge("C", "A", "C - A");
+
+        assertEquals(3, graph.numVertices(), "It should have 3 vertices");
+        assertEquals(3, graph.numEdges(), "It should have 3 edge");
+        assertTrue(graph.areAdjacent("A", "B"));
+        assertTrue(graph.areAdjacent("B", "A"));
+
+        graph.removeEdge("A", "B");
+
+        assertFalse(graph.areAdjacent("A", "B"));
+        assertFalse(graph.areAdjacent("B", "A"));
+        assertEquals(3, graph.numVertices(), "It should have 2 vertices");
+        assertEquals(2, graph.numEdges(), "It should have 1 edge");
+    }
+
 
     @Test
     @DisplayName("It should avoid adding duplicated edge elements")

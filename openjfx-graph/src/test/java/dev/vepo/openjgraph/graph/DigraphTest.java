@@ -33,10 +33,56 @@ public class DigraphTest {
         graph.insertEdge("B", "C", "B - C");
         graph.insertEdge("C", "A", "C - A");
 
-        assertEquals(3, graph.numVertices(), "It should have 2 vertices");
-        assertEquals(3, graph.numEdges(), "It should have 1 edge");
+        assertEquals(3, graph.numVertices(), "It should have 3 vertices");
+        assertEquals(3, graph.numEdges(), "It should have 3 edge");
         assertTrue(graph.areAdjacent("A", "B"));
         assertFalse(graph.areAdjacent("B", "A"));
+    }
+
+    @Test
+    @DisplayName("It should test if one vertex can be removed")
+    void removeVertexTest() {
+        var graph = Digraph.<String, String>newDigraph();
+        graph.insertVertex("A");
+        graph.insertVertex("B");
+        graph.insertVertex("C");
+        graph.insertEdge("A", "B", "A - B");
+        graph.insertEdge("B", "C", "B - C");
+        graph.insertEdge("C", "A", "C - A");
+
+        assertEquals(3, graph.numVertices(), "It should have 3 vertices");
+        assertEquals(3, graph.numEdges(), "It should have 3 edge");
+        assertTrue(graph.areAdjacent("A", "B"));
+        assertFalse(graph.areAdjacent("B", "A"));
+
+        graph.removeVertex(new Vertex<String>("C"));
+
+        assertEquals(2, graph.numVertices(), "It should have 2 vertices");
+        assertEquals(1, graph.numEdges(), "It should have 1 edge");
+    }
+
+    @Test
+    @DisplayName("It should test if one edge can be removed")
+    void removeEdgeTest() {
+        var graph = Digraph.<String, String>newDigraph();
+        graph.insertVertex("A");
+        graph.insertVertex("B");
+        graph.insertVertex("C");
+        graph.insertEdge("A", "B", "A - B");
+        graph.insertEdge("B", "C", "B - C");
+        graph.insertEdge("C", "A", "C - A");
+
+        assertEquals(3, graph.numVertices(), "It should have 3 vertices");
+        assertEquals(3, graph.numEdges(), "It should have 3 edge");
+        assertTrue(graph.areAdjacent("A", "B"));
+        assertFalse(graph.areAdjacent("B", "A"));
+
+        graph.removeEdge("A", "B");
+
+        assertFalse(graph.areAdjacent("A", "B"));
+        assertFalse(graph.areAdjacent("B", "A"));
+        assertEquals(3, graph.numVertices(), "It should have 2 vertices");
+        assertEquals(2, graph.numEdges(), "It should have 1 edge");
     }
 
     @Test
@@ -62,8 +108,10 @@ public class DigraphTest {
         assertThrows(InvalidVertexException.class, () -> graph.insertEdge("X", "C", "X- B"));
         assertThrows(InvalidVertexException.class, () -> graph.insertEdge("B", "X", "B - X"));
         assertThrows(InvalidVertexException.class, () -> graph.insertEdge(null, "X", "B - X"));
-        assertThrows(InvalidVertexException.class, () -> graph.insertEdge(new Vertex<>("X"), new Vertex<>("C"), "X- B"));
-        assertThrows(InvalidVertexException.class, () -> graph.insertEdge(new Vertex<>("B"), new Vertex<>("X"), "B - X"));
+        assertThrows(InvalidVertexException.class,
+                     () -> graph.insertEdge(new Vertex<>("X"), new Vertex<>("C"), "X- B"));
+        assertThrows(InvalidVertexException.class,
+                     () -> graph.insertEdge(new Vertex<>("B"), new Vertex<>("X"), "B - X"));
         assertThrows(InvalidVertexException.class, () -> graph.insertEdge(null, new Vertex<>("X"), "B - X"));
     }
 }

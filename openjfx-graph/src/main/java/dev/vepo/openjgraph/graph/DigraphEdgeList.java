@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Implementation of a digraph that adheres to the {@link Digraph} interface.
@@ -62,9 +63,9 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
         List<Edge<E, V>> incidentEdges = new ArrayList<>();
         for (Edge<E, V> edge : edges.values()) {
 
-            // if (((MyEdge) edge).getInbound() == inbound) {
-            // incidentEdges.add(edge);
-            // }
+            if (edge.vertexA().equals(inbound)) {
+                incidentEdges.add(edge);
+            }
         }
         return incidentEdges;
     }
@@ -76,9 +77,9 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
         List<Edge<E, V>> outboundEdges = new ArrayList<>();
         for (Edge<E, V> edge : edges.values()) {
 
-            // if (((MyEdge) edge).getOutbound() == outbound) {
-            // outboundEdges.add(edge);
-            // }
+            if (edge.vertexB().equals(outbound)) {
+                outboundEdges.add(edge);
+            }
         }
         return outboundEdges;
     }
@@ -227,6 +228,15 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
         edges.remove(e.element());
 
         return element;
+    }
+
+    @Override
+    public Optional<E> removeEdge(V outbound, V inbound) throws InvalidEdgeException {
+        return edges.values()
+                    .stream()
+                    .filter(edge -> edge.vertexA().element().equals(outbound) && edge.vertexB().element().equals(inbound))
+                    .findFirst()
+                    .map(this::removeEdge);
     }
 
     @Override

@@ -25,6 +25,7 @@
 package dev.vepo.openjgraph.graph;
 
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * A directed graph (or digraph) is a graph that is made up of a set of vertices
@@ -173,5 +174,18 @@ public interface Digraph<V, E> extends Graph<V, E> {
         @Override
         Edge<E, V> insertEdge(V outboundElement, V inboundElement, E edgeElement)
                         throws InvalidVertexException, InvalidEdgeException;
+
+        /**
+         * Removes an edge and return its element.
+         * 
+         * @param outbound outbound vertex
+         * @param inbound  inbound vertex
+         * 
+         * @return element stored at the removed edge
+         * 
+         * @exception InvalidEdgeException if <code>e</code> is an invalid edge for the
+         *                                 graph.
+         */
+        Optional<E> removeEdge(V outbound, V inbound) throws InvalidEdgeException;
 
 }

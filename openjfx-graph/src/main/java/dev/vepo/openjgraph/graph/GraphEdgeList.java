@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * ADT Graph implementation that stores a collection of edges (and vertices) and
@@ -88,12 +89,9 @@ class GraphEdgeList<V, E> implements Graph<V, E> {
 
         List<Edge<E, V>> incidentEdges = new ArrayList<>();
         for (Edge<E, V> edge : edges.values()) {
-
             if (edge.contains(v)) {
-                /* edge.vertices()[0] == v || edge.vertices()[1] == v */
                 incidentEdges.add(edge);
             }
-
         }
 
         return incidentEdges;
@@ -206,6 +204,16 @@ class GraphEdgeList<V, E> implements Graph<V, E> {
         vertices.remove(v.element());
 
         return element;
+    }
+
+    @Override
+    public Optional<E> removeEdge(V u, V v) throws InvalidEdgeException {
+        return edges.values()
+                    .stream()
+                    .filter(edge -> (edge.vertexA().element().equals(u) && edge.vertexB().element().equals(v))
+                            || (edge.vertexA().element().equals(v) && edge.vertexB().element().equals(u)))
+                    .findFirst()
+                    .map(this::removeEdge);
     }
 
     @Override

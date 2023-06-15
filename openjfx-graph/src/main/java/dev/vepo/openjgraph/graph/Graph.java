@@ -24,6 +24,7 @@
 package dev.vepo.openjgraph.graph;
 
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * A graph is made up of a set of vertices connected by edges, where the edges
@@ -230,6 +231,19 @@ public interface Graph<V, E> {
          *                                 graph.
          */
         E removeEdge(Edge<E, V> e) throws InvalidEdgeException;
+
+        /**
+         * Removes an edge and return its element.
+         * 
+         * @param u a vertex
+         * @param v another vertex
+         * 
+         * @return element stored at the removed edge
+         * 
+         * @exception InvalidEdgeException if <code>e</code> is an invalid edge for the
+         *                                 graph.
+         */
+        Optional<E> removeEdge(V u, V v) throws InvalidEdgeException;
 
         /**
          * Replaces the element of a given vertex with a new element and returns the
