@@ -42,8 +42,8 @@ jobs:
             [
               { 
                 "id": "ossrh", 
-                "username": ${{ secrets.OSSRH_USER }}, 
-                "password": ${{ secrets.OSSRH_PASS }} 
+                "username": "${{ secrets.OSSRH_USER }}", 
+                "password": "${{ secrets.OSSRH_PASS }}" 
               }
             ]
           profiles: >
@@ -51,8 +51,8 @@ jobs:
               {
                 "id": "ossrh",
                 "properties": {
-                  "gpg.executable": ${{ secrets.GPG_EXEC }},
-                  "gpg.passphrase": ${{ secrets.GPG_PASS }}
+                  "gpg.executable": "${{ secrets.GPG_EXEC }}",
+                  "gpg.passphrase": "${{ secrets.GPG_PASS }}"
                 }
               }
             ]
