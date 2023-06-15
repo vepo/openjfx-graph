@@ -103,6 +103,27 @@ public interface Digraph<V, E> extends Graph<V, E> {
                         throws InvalidVertexException;
 
         /**
+         * Evaluates whether two vertices are adjacent, i.e., there exists some
+         * directed-edge connecting <code>outbound</code> and <code>inbound</code>.
+         * <br/>
+         * The existing edge must be directed as <code>outbound --&gt; inbound</code>.
+         * <br/>
+         * If, for example, there exists only an edge
+         * <code>outbound &lt;-- inbound</code>, they are not considered adjacent.
+         * 
+         * @param outbound outbound vertex
+         * @param inbound  inbound vertex
+         * 
+         * @return true if they are adjacent, false otherwise.
+         * 
+         * @exception InvalidVertexException if <code>outbound</code> or
+         *                                   <code>inbound</code> are invalid vertices
+         *                                   for the graph
+         */
+        @Override
+        boolean areAdjacent(V outbound, V inbound) throws InvalidVertexException;
+
+        /**
          * Inserts a new edge with a given element between two existing vertices and
          * return its (the edge's) reference.
          * 

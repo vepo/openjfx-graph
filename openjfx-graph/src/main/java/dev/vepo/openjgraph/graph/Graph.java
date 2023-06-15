@@ -79,7 +79,7 @@ public interface Graph<V, E> {
          * Returns if the given element exists in edge collection.
          * 
          * @param e
-         * @return 
+         * @return
          */
         boolean hasEdge(E e);
 
@@ -126,6 +126,20 @@ public interface Graph<V, E> {
          */
         boolean areAdjacent(Vertex<V> u, Vertex<V> v)
                         throws InvalidVertexException;
+
+        /**
+         * Evaluates whether two vertices are adjacent, i.e., there exists some edge
+         * connecting <code>u</code> and <code>v</code>.
+         * 
+         * @param u a vertex
+         * @param v another vertex
+         * 
+         * @return true if they are adjacent, false otherwise.
+         * 
+         * @exception InvalidVertexException if <code>u</code> or <code>v</code> are
+         *                                   invalid vertices for the graph
+         */
+        boolean areAdjacent(V u, V v) throws InvalidVertexException;
 
         /**
          * Inserts a new vertex with a given element, returning its reference.

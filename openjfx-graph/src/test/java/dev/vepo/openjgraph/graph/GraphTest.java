@@ -1,18 +1,17 @@
 package dev.vepo.openjgraph.graph;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class DigraphTest {
+public class GraphTest {
 
     @Test
-    @DisplayName("It should be possible to create a Digraph")
+    @DisplayName("It should be possible to create a Graph")
     void simpleTest() {
-        var graph = Digraph.<String, String>newDigraph();
+        var graph = Graph.<String, String>newGraph();
         graph.insertVertex("A");
         graph.insertVertex("B");
         graph.insertEdge("A", "B", "PATH");
@@ -22,9 +21,9 @@ public class DigraphTest {
     }
 
     @Test
-    @DisplayName("Create a simple graph without label in edge")
-    void simpleWithoutEdgeLabelTest() {
-        var graph = Digraph.<String, String>newDigraph();
+    @DisplayName("It should test if two vertex are adjacentes")
+    void areAdjacentTest() {
+        var graph = Graph.<String, String>newGraph();
         graph.insertVertex("A");
         graph.insertVertex("B");
         graph.insertVertex("C");
@@ -35,6 +34,6 @@ public class DigraphTest {
         assertEquals(3, graph.numVertices(), "It should have 2 vertices");
         assertEquals(3, graph.numEdges(), "It should have 1 edge");
         assertTrue(graph.areAdjacent("A", "B"));
-        assertFalse(graph.areAdjacent("B", "A"));
+        assertTrue(graph.areAdjacent("B", "A"));
     }
 }

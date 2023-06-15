@@ -132,6 +132,11 @@ class GraphEdgeList<V, E> implements Graph<V, E> {
     }
 
     @Override
+    public boolean areAdjacent(V u, V v) throws InvalidVertexException {
+        return areAdjacent(vertices.get(u), vertices.get(v));
+    }
+
+    @Override
     public synchronized Vertex<V> insertVertex(V vElement) throws InvalidVertexException {
         if (existsVertexWith(vElement)) {
             throw new InvalidVertexException("There's already a vertex with this element.");

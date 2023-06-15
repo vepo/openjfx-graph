@@ -45,4 +45,8 @@ public record Edge<E, V>(Vertex<V> vertexA,
     public boolean contains(Vertex<V> vertex) {
         return vertexA.equals(vertex) || vertexB.equals(vertex);
     }
+
+    public String label() {
+        return element.toString();
+    }
 }

@@ -25,7 +25,6 @@
 package dev.vepo.openjgraph.graph;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -100,6 +99,11 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
     }
 
     @Override
+    public boolean areAdjacent(V outbound, V inbound) throws InvalidVertexException {
+        return areAdjacent(vertices.get(outbound), vertices.get(inbound));
+    }
+
+    @Override
     public synchronized Edge<E, V> insertEdge(Vertex<V> outbound, Vertex<V> inbound, E edgeElement)
             throws InvalidVertexException, InvalidEdgeException {
         if (existsEdgeWith(edgeElement)) {
@@ -110,9 +114,9 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
         Vertex<V> inVertex = checkVertex(inbound);
 
         Edge<E, V> newEdge = new Edge<>(outVertex, inVertex, true, 1.0, edgeElement);
-        
+
         edges.put(edgeElement, newEdge);
-        
+
         return newEdge;
     }
 
