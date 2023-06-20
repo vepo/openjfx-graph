@@ -247,17 +247,18 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
 
         vertices.remove(oldElement);
         vertices.put(newElement, newVertex);
-        var allEdges = edges.values().stream().filter(e -> e.contains(vertex)).collect(toList());
-        allEdges.forEach(e -> {
-            edges.remove(e);
-            if (e.vertexA().equals(vertex)) {
-                edges.replace(e.element(),
-                              new Edge<E, V>(newVertex, e.vertexB(), e.directed(), e.weight(), e.element()));
-            } else {
-                edges.replace(e.element(),
-                              new Edge<E, V>(e.vertexA(), newVertex, e.directed(), e.weight(), e.element()));
-            }
-        });
+        edges.values()
+             .stream()
+             .filter(e -> e.contains(vertex))
+             .toList()
+             .forEach(e -> {
+                 edges.remove(e);
+                 if (e.vertexA().equals(vertex)) {
+                     edges.replace(e.element(), new Edge<>(newVertex, e.vertexB(), e.directed(), e.weight(), e.element()));
+                 } else {
+                     edges.replace(e.element(), new Edge<>(e.vertexA(), newVertex, e.directed(), e.weight(), e.element()));
+                 }
+             });
 
         return oldElement;
     }
@@ -283,7 +284,7 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(String.format("Graph with %d vertices and %d edges:\n", numVertices(), numEdges()));
+        StringBuilder sb = new StringBuilder(String.format("Graph with %d vertices and %d edges:%n", numVertices(), numEdges()));
 
         sb.append("--- Vertices: \n");
         for (Vertex<V, E> v : vertices.values()) {
@@ -299,7 +300,7 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
     private Vertex<V, E> vertexOf(V vElement) {
         for (Vertex<V, E> v : vertices.values()) {
             if (v.element().equals(vElement)) {
-                return (Vertex<V, E>) v;
+                return v;
             }
         }
         return null;
@@ -344,7 +345,7 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
 
         Edge<E, V> edge;
         try {
-            edge = (Edge<E, V>) e;
+            edge = e;
         } catch (ClassCastException ex) {
             throw new InvalidVertexException("Not an adge.");
         }

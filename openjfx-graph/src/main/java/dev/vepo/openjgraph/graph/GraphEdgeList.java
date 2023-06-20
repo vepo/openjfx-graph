@@ -234,15 +234,18 @@ class GraphEdgeList<V, E> implements Graph<V, E> {
 
         vertices.remove(oldElement);
         vertices.put(newElement, newVertex);
-        var allEdges = edges.values().stream().filter(e -> e.contains(vertex)).collect(toList());
-        allEdges.forEach(e -> {
-            edges.remove(e);
-            if (e.vertexA().equals(vertex)) {
-                edges.replace(e.element(), new Edge<E, V>(newVertex, e.vertexB(), e.directed(), e.weight(), e.element()));
-            } else {
-                edges.replace(e.element(), new Edge<E, V>(e.vertexA(), newVertex, e.directed(), e.weight(), e.element()));
-            }
-        });
+        edges.values()
+             .stream()
+             .filter(e -> e.contains(vertex))
+             .toList()
+             .forEach(e -> {
+                 edges.remove(e);
+                 if (e.vertexA().equals(vertex)) {
+                     edges.replace(e.element(), new Edge<E, V>(newVertex, e.vertexB(), e.directed(), e.weight(), e.element()));
+                 } else {
+                     edges.replace(e.element(), new Edge<E, V>(e.vertexA(), newVertex, e.directed(), e.weight(), e.element()));
+                 }
+             });
 
         return oldElement;
     }
@@ -265,7 +268,7 @@ class GraphEdgeList<V, E> implements Graph<V, E> {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(String.format("Graph with %d vertices and %d edges:\n", numVertices(), numEdges()));
+        StringBuilder sb = new StringBuilder(String.format("Graph with %d vertices and %d edges:%n", numVertices(), numEdges()));
 
         sb.append("--- Vertices: \n");
         for (Vertex<V, E> v : vertices.values()) {
@@ -287,7 +290,7 @@ class GraphEdgeList<V, E> implements Graph<V, E> {
     private Vertex<V, E> vertexOf(V vElement) {
         for (Vertex<V, E> v : vertices.values()) {
             if (v.element().equals(vElement)) {
-                return (Vertex<V, E>) v;
+                return v;
             }
         }
         return null;

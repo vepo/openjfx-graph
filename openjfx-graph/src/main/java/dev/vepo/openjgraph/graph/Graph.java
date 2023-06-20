@@ -66,7 +66,8 @@ public interface Graph<V, E> {
 
         Path<V, E> shortestPath = null;
         var queue = new LinkedList<Path<V, E>>();
-        queue.add(new Path<V, E>(source));
+        queue.add(new Path<>(source));
+
         while (!queue.isEmpty()) {
             var path = queue.removeFirst();
             if (path.endsWith(destiny)) {
