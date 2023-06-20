@@ -54,26 +54,26 @@ public class Main extends Application {
     public void start(Stage ignored) {
 
         Graph<String, String> g = build_sample_digraph();
-        //Graph<String, String> g = build_flower_graph();
+        // Graph<String, String> g = build_flower_graph();
         System.out.println(g);
-        
+
         SmartPlacementStrategy strategy = new SmartCircularSortedPlacementStrategy();
-        //SmartPlacementStrategy strategy = new SmartRandomPlacementStrategy();
+        // SmartPlacementStrategy strategy = new SmartRandomPlacementStrategy();
         SmartGraphPanel<String, String> graphView = new SmartGraphPanel<>(g, strategy);
 
         /*
-        After creating, you can change the styling of some element.
-        This can be done at any time afterwards.
-        */
+         * After creating, you can change the styling of some element. This can be done
+         * at any time afterwards.
+         */
         if (g.numVertices() > 0) {
             graphView.getStylableVertex("A").setStyle("-fx-fill: gold; -fx-stroke: brown;");
         }
 
         /*
-        Basic usage:            
-        Use SmartGraphDemoContainer if you want zoom capabilities and automatic layout toggling
-        */
-        //Scene scene = new Scene(graphView, 1024, 768);
+         * Basic usage: Use SmartGraphDemoContainer if you want zoom capabilities and
+         * automatic layout toggling
+         */
+        // Scene scene = new Scene(graphView, 1024, 768);
         Scene scene = new Scene(new SmartGraphDemoContainer(graphView), 1024, 768);
 
         Stage stage = new Stage(StageStyle.DECORATED);
@@ -84,65 +84,67 @@ public class Main extends Application {
         stage.show();
 
         /*
-        IMPORTANT: Must call init() after scene is displayed, so we can have width and height values
-        to initially place the vertices according to the placement strategy.
-        */
+         * IMPORTANT: Must call init() after scene is displayed, so we can have width
+         * and height values to initially place the vertices according to the placement
+         * strategy.
+         */
         graphView.init();
 
         /*
-        Bellow you can see how to attach actions for when vertices and edges are double-clicked
-         */        
+         * Bellow you can see how to attach actions for when vertices and edges are
+         * double-clicked
+         */
         graphView.setVertexDoubleClickAction((SmartGraphVertex<String, String> graphVertex) -> {
             System.out.println("Vertex contains element: " + graphVertex.getUnderlyingVertex().element());
-                      
-            //toggle different styling
-            if( !graphVertex.removeStyleClass("myVertex") ) {
-                /* for the golden vertex, this is necessary to clear the inline
-                css class. Otherwise, it has priority. Test and uncomment. */
-                //graphVertex.setStyle(null);
-                
+
+            // toggle different styling
+            if (!graphVertex.removeStyleClass("myVertex")) {
+                /*
+                 * for the golden vertex, this is necessary to clear the inline css class.
+                 * Otherwise, it has priority. Test and uncomment.
+                 */
+                // graphVertex.setStyle(null);
+
                 graphVertex.addStyleClass("myVertex");
             }
-            
-            //want fun? uncomment below with automatic layout
-            //g.removeVertex(graphVertex.getUnderlyingVertex());
-            //graphView.update();
+
+            // want fun? uncomment below with automatic layout
+            // g.removeVertex(graphVertex.getUnderlyingVertex());
+            // graphView.update();
         });
 
         graphView.setEdgeDoubleClickAction(graphEdge -> {
             System.out.println("Edge contains element: " + graphEdge.getUnderlyingEdge().element());
-            //dynamically change the style when clicked
+            // dynamically change the style when clicked
             graphEdge.setStyle("-fx-stroke: black; -fx-stroke-width: 3;");
-            
+
             graphEdge.getStylableArrow().setStyle("-fx-stroke: black; -fx-stroke-width: 3;");
-            
-            //uncomment to see edges being removed after click
-            //Edge<String, String> underlyingEdge = graphEdge.getUnderlyingEdge();
-            //g.removeEdge(underlyingEdge);
-            //graphView.update();
+
+            // uncomment to see edges being removed after click
+            // Edge<String, String> underlyingEdge = graphEdge.getUnderlyingEdge();
+            // g.removeEdge(underlyingEdge);
+            // graphView.update();
         });
 
         /*
-        Should proceed with automatic layout or keep original placement?
-        If using SmartGraphDemoContainer you can toggle this in the UI 
+         * Should proceed with automatic layout or keep original placement? If using
+         * SmartGraphDemoContainer you can toggle this in the UI
          */
-        //graphView.setAutomaticLayout(true);
+        // graphView.setAutomaticLayout(true);
 
-        /* 
-        Uncomment lines to test adding of new elements
+        /*
+         * Uncomment lines to test adding of new elements
          */
-        //continuously_test_adding_elements(g, graphView);
-        //stage.setOnCloseRequest(event -> {
-        //    running = false;
-        //});
+        // continuously_test_adding_elements(g, graphView);
+        // stage.setOnCloseRequest(event -> {
+        // running = false;
+        // });
     }
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
-        launch(args);
-    }
+    public static void main(String[] args) { launch(args); }
 
     private Graph<String, String> build_sample_digraph() {
 
@@ -165,7 +167,7 @@ public class Main extends Application {
         g.insertEdge("F", "D", "DF");
         g.insertEdge("F", "D", "DF2");
 
-        //yep, its a loop!
+        // yep, its a loop!
         g.insertEdge("A", "A", "Loop");
 
         return g;
@@ -207,62 +209,63 @@ public class Main extends Application {
 
         g.insertEdge("A", "H", "0");
 
-        //g.insertVertex("ISOLATED");
-        
+        // g.insertVertex("ISOLATED");
+
         return g;
     }
 
-    private static final Random random = new Random(/* seed to reproduce*/);
+    private static final Random random = new Random(/* seed to reproduce */);
 
     private void continuously_test_adding_elements(Graph<String, String> g, SmartGraphPanel<String, String> graphView) {
-        //update graph
+        // update graph
         running = true;
-        final long ITERATION_WAIT = 3000; //milliseconds
+        final long ITERATION_WAIT = 3000; // milliseconds
 
         Runnable r;
         r = () -> {
             int count = 0;
-            
+
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                Thread.currentThread().interrupt();
             }
-            
+
             while (running) {
                 try {
                     Thread.sleep(ITERATION_WAIT);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    Thread.currentThread().interrupt();
                 }
-                
-                //generate new vertex with 2/3 probability, else connect two
-                //existing
+
+                // generate new vertex with 2/3 probability, else connect two
+                // existing
                 String id = String.format("%02d", ++count);
                 if (random.nextInt(3) < 2) {
-                    //add a new vertex connected to a random existing vertex
+                    // add a new vertex connected to a random existing vertex
                     Vertex<String, String> existing = get_random_vertex(g);
                     Vertex<String, String> vertexId = g.insertVertex(("V" + id));
                     g.insertEdge(existing, vertexId, ("E" + id));
-                    
-                    //this variant must be called to ensure the view has reflected the
-                    //underlying graph before styling a node immediately after.
+
+                    // this variant must be called to ensure the view has reflected the
+                    // underlying graph before styling a node immediately after.
                     graphView.updateAndWait();
-                    
-                    //color new vertices
+
+                    // color new vertices
                     SmartStylableNode stylableVertex = graphView.getStylableVertex(vertexId);
-                    if(stylableVertex != null) {
+                    if (stylableVertex != null) {
                         stylableVertex.setStyle("-fx-fill: orange;");
                     }
                 } else {
                     Vertex<String, String> existing1 = get_random_vertex(g);
                     Vertex<String, String> existing2 = get_random_vertex(g);
                     g.insertEdge(existing1, existing2, ("E" + id));
-                    
+
                     graphView.update();
                 }
 
-                
             }
         };
 

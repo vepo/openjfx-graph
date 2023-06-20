@@ -26,6 +26,7 @@ package dev.vepo.openjgraph.graphview;
 import static dev.vepo.openjgraph.graphview.UtilitiesJavaFX.pick;
 import static dev.vepo.openjgraph.graphview.UtilitiesPoint2D.attractiveForce;
 import static dev.vepo.openjgraph.graphview.UtilitiesPoint2D.repellingForce;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 import java.io.File;
@@ -240,7 +241,7 @@ public class SmartGraphPanel<V, E> extends Pane {
      *                               called.
      */
     public void init() throws IllegalStateException {
-        if (this.getScene() == null) {
+        if (isNull(this.getScene())) {
             throw new IllegalStateException("You must call this method after the instance was added to a scene.");
         } else if (this.getWidth() == 0 || this.getHeight() == 0) {
             throw new IllegalStateException("The layout for this panel has zero width and/or height");
@@ -295,7 +296,7 @@ public class SmartGraphPanel<V, E> extends Pane {
      * vertices.
      */
     public void update() {
-        if (this.getScene() == null) {
+        if (isNull(this.getScene())) {
             throw new IllegalStateException("You must call this method after the instance was added to a scene.");
         }
 
@@ -305,9 +306,7 @@ public class SmartGraphPanel<V, E> extends Pane {
 
         // this will be called from a non-javafx thread, so this must be guaranteed to
         // run of the graphics thread
-        Platform.runLater(() -> {
-            updateNodes();
-        });
+        Platform.runLater(() -> updateNodes());
 
     }
 
@@ -323,7 +322,7 @@ public class SmartGraphPanel<V, E> extends Pane {
      * vertices.
      */
     public void updateAndWait() {
-        if (this.getScene() == null) {
+        if (isNull(this.getScene())) {
             throw new IllegalStateException("You must call this method after the instance was added to a scene.");
         }
 
@@ -331,12 +330,9 @@ public class SmartGraphPanel<V, E> extends Pane {
             throw new IllegalStateException("You must call init() method before any updates.");
         }
 
-        final FutureTask update = new FutureTask(new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                updateNodes();
-                return true;
-            }
+        var update = new FutureTask<>(() -> {
+            updateNodes();
+            return true;
         });
 
         //
@@ -348,7 +344,9 @@ public class SmartGraphPanel<V, E> extends Pane {
             // wait for completion, only outside javafx thread; otherwise -> deadlock
             try {
                 update.get(1, TimeUnit.SECONDS);
-            } catch (InterruptedException | ExecutionException | TimeoutException ex) {
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            } catch (ExecutionException | TimeoutException ex) {
                 Logger.getLogger(SmartGraphPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
@@ -384,14 +382,11 @@ public class SmartGraphPanel<V, E> extends Pane {
      * NODES CREATION/UPDATES
      */
     private void initNodes() {
-
         /* create vertex graphical representations */
         for (Vertex<V, E> vertex : listOfVertices()) {
-            SmartGraphVertexNode<V, E> vertexAnchor = new SmartGraphVertexNode(vertex, 0, 0,
-                                                                               graphProperties.getVertexRadius(),
-                                                                               graphProperties.getVertexAllowUserMove());
-
-            vertexNodes.put(vertex, vertexAnchor);
+            vertexNodes.put(vertex, new SmartGraphVertexNode<>(vertex, 0, 0,
+                                                               graphProperties.getVertexRadius(),
+                                                               graphProperties.getVertexAllowUserMove()));
         }
 
         /* create edges graphical representations between existing vertices */
@@ -697,39 +692,43 @@ public class SmartGraphPanel<V, E> extends Pane {
     }
 
     private String generateVertexLabel(V vertex) {
-
-        try {
-            Class<?> clazz = vertex.getClass();
-            for (Method method : clazz.getDeclaredMethods()) {
-                if (method.isAnnotationPresent(SmartLabelSource.class)) {
-                    method.setAccessible(true);
-                    Object value = method.invoke(vertex);
-                    return value.toString();
+        if (nonNull(vertex)) {
+            try {
+                Class<?> clazz = vertex.getClass();
+                for (Method method : clazz.getDeclaredMethods()) {
+                    if (method.isAnnotationPresent(SmartLabelSource.class)) {
+                        method.setAccessible(true);
+                        Object value = method.invoke(vertex);
+                        return value.toString();
+                    }
                 }
+            } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                Logger.getLogger(SmartGraphPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            Logger.getLogger(SmartGraphPanel.class.getName()).log(Level.SEVERE, null, ex);
+            return vertex.toString();
+        } else {
+            return "<NULL>";
         }
-
-        return vertex != null ? vertex.toString() : "<NULL>";
     }
 
     private String generateEdgeLabel(E edge) {
-
-        try {
-            Class<?> clazz = edge.getClass();
-            for (Method method : clazz.getDeclaredMethods()) {
-                if (method.isAnnotationPresent(SmartLabelSource.class)) {
-                    method.setAccessible(true);
-                    Object value = method.invoke(edge);
-                    return value.toString();
+        if (nonNull(edge)) {
+            try {
+                Class<?> clazz = edge.getClass();
+                for (Method method : clazz.getDeclaredMethods()) {
+                    if (method.isAnnotationPresent(SmartLabelSource.class)) {
+                        method.setAccessible(true);
+                        Object value = method.invoke(edge);
+                        return value.toString();
+                    }
                 }
+            } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                Logger.getLogger(SmartGraphPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            Logger.getLogger(SmartGraphPanel.class.getName()).log(Level.SEVERE, null, ex);
+            return edge.toString();
+        } else {
+            return "<NULL>";
         }
-
-        return edge != null ? edge.toString() : "<NULL>";
     }
 
     /**

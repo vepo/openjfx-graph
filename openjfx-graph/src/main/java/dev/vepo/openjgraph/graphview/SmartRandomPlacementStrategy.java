@@ -37,19 +37,11 @@ import dev.vepo.openjgraph.graph.Graph;
  */
 public class SmartRandomPlacementStrategy implements SmartPlacementStrategy {
 
+    private static final Random RAND = new Random();
+
     @Override
     public <V, E> void place(double width, double height, Graph<V, E> theGraph, Collection<? extends SmartGraphVertex<V, E>> vertices) {
-
-        Random rand = new Random();
-
-        for (SmartGraphVertex<V, E> vertex : vertices) {
-
-            double x = rand.nextDouble() * width;
-            double y = rand.nextDouble() * height;
-
-            vertex.setPosition(x, y);
-
-        }
+        vertices.forEach(vertex -> vertex.setPosition(RAND.nextDouble() * width, RAND.nextDouble() * height));
     }
 
 }

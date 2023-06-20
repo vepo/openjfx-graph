@@ -36,8 +36,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Properties used by {@link SmartGraphPanel}. Default file is given by
- * the {@link #DEFAULT_FILE} property.
+ * Properties used by {@link SmartGraphPanel}. Default file is given by the
+ * {@link #DEFAULT_FILE} property.
  *
  * @see SmartGraphPanel
  * @see SmartGraphVertex
@@ -90,7 +90,7 @@ public class SmartGraphProperties {
         properties = new Properties();
 
         var resource = SmartGraphProperties.class.getResourceAsStream(DEFAULT_FILE);
-        if(nonNull(resource)) {
+        if (nonNull(resource)) {
             try {
                 properties.load(resource);
             } catch (IOException e) {
@@ -102,7 +102,9 @@ public class SmartGraphProperties {
         var propertiesFile = Paths.get(DEFAULT_FILE).toFile();
         if (propertiesFile.exists()) {
             try {
-                properties.load(new FileInputStream(DEFAULT_FILE));
+                try (var inStream = new FileInputStream(DEFAULT_FILE)) {
+                    properties.load(inStream);
+                }
             } catch (IOException ex) {
                 String msg = String.format("The default %s was not found. Using default values.", DEFAULT_FILE);
                 Logger.getLogger(SmartGraphProperties.class.getName()).log(Level.WARNING, msg);
@@ -137,33 +139,27 @@ public class SmartGraphProperties {
     }
 
     /**
-     * Returns a property that indicates whether a vertex can be moved freely
-     * by the user.
+     * Returns a property that indicates whether a vertex can be moved freely by the
+     * user.
      * 
      * @return corresponding property value
      */
-    public boolean getVertexAllowUserMove() {
-        return getBooleanProperty(PROPERTY_VERTEX_ALLOW_USER_MOVE, DEFAULT_VERTEX_ALLOW_USER_MOVE);
-    }
+    public boolean getVertexAllowUserMove() { return getBooleanProperty(PROPERTY_VERTEX_ALLOW_USER_MOVE, DEFAULT_VERTEX_ALLOW_USER_MOVE); }
 
     /**
      * Returns a property that indicates the radius of each vertex.
      * 
      * @return corresponding property value
      */
-    public double getVertexRadius() {
-        return getDoubleProperty(PROPERTY_VERTEX_RADIUS, DEFAULT_VERTEX_RADIUS);
-    }
+    public double getVertexRadius() { return getDoubleProperty(PROPERTY_VERTEX_RADIUS, DEFAULT_VERTEX_RADIUS); }
 
     /**
-     * Returns a property that indicates the repulsion force to use in the
-     * automatic force-based layout.
+     * Returns a property that indicates the repulsion force to use in the automatic
+     * force-based layout.
      * 
      * @return corresponding property value
      */
-    public double getRepulsionForce() {
-        return getDoubleProperty(PROPERTY_REPULSION_FORCE, DEFAULT_REPULSION_FORCE);
-    }
+    public double getRepulsionForce() { return getDoubleProperty(PROPERTY_REPULSION_FORCE, DEFAULT_REPULSION_FORCE); }
 
     /**
      * Returns a property that indicates the attraction force to use in the
@@ -171,9 +167,7 @@ public class SmartGraphProperties {
      * 
      * @return corresponding property value
      */
-    public double getAttractionForce() {
-        return getDoubleProperty(PROPERTY_ATTRACTION_FORCE, DEFAULT_ATTRACTION_FORCE);
-    }
+    public double getAttractionForce() { return getDoubleProperty(PROPERTY_ATTRACTION_FORCE, DEFAULT_ATTRACTION_FORCE); }
 
     /**
      * Returns a property that indicates the attraction scale to use in the
@@ -181,18 +175,14 @@ public class SmartGraphProperties {
      * 
      * @return corresponding property value
      */
-    public double getAttractionScale() {
-        return getDoubleProperty(PROPERTY_ATTRACTION_SCALE, DEFAULT_ATTRACTION_SCALE);
-    }
+    public double getAttractionScale() { return getDoubleProperty(PROPERTY_ATTRACTION_SCALE, DEFAULT_ATTRACTION_SCALE); }
 
     /**
      * Returns a property that indicates whether a vertex has a tooltip installed.
      * 
      * @return corresponding property value
      */
-    public boolean getUseVertexTooltip() {
-        return getBooleanProperty(PROPERTY_VERTEX_USE_TOOLTIP, DEFAULT_VERTEX_USE_TOOLTIP);
-    }
+    public boolean getUseVertexTooltip() { return getBooleanProperty(PROPERTY_VERTEX_USE_TOOLTIP, DEFAULT_VERTEX_USE_TOOLTIP); }
 
     /**
      * Returns a property that indicates whether a vertex has a {@link SmartLabel}
@@ -200,18 +190,14 @@ public class SmartGraphProperties {
      * 
      * @return corresponding property value
      */
-    public boolean getUseVertexLabel() {
-        return getBooleanProperty(PROPERTY_VERTEX_USE_LABEL, DEFAULT_VERTEX_USE_LABEL);
-    }
+    public boolean getUseVertexLabel() { return getBooleanProperty(PROPERTY_VERTEX_USE_LABEL, DEFAULT_VERTEX_USE_LABEL); }
 
     /**
      * Returns a property that indicates whether an edge has a tooltip installed.
      * 
      * @return corresponding property value
      */
-    public boolean getUseEdgeTooltip() {
-        return getBooleanProperty(PROPERTY_EDGE_USE_TOOLTIP, DEFAULT_EDGE_USE_TOOLTIP);
-    }
+    public boolean getUseEdgeTooltip() { return getBooleanProperty(PROPERTY_EDGE_USE_TOOLTIP, DEFAULT_EDGE_USE_TOOLTIP); }
 
     /**
      * Returns a property that indicates whether an edge has a {@link SmartLabel}
@@ -219,9 +205,7 @@ public class SmartGraphProperties {
      * 
      * @return corresponding property value
      */
-    public boolean getUseEdgeLabel() {
-        return getBooleanProperty(PROPERTY_EDGE_USE_LABEL, DEFAULT_EDGE_USE_LABEL);
-    }
+    public boolean getUseEdgeLabel() { return getBooleanProperty(PROPERTY_EDGE_USE_LABEL, DEFAULT_EDGE_USE_LABEL); }
 
     /**
      * Returns a property that indicates whether a {@link SmartArrow} should be
@@ -229,18 +213,14 @@ public class SmartGraphProperties {
      * 
      * @return corresponding property value
      */
-    public boolean getUseEdgeArrow() {
-        return getBooleanProperty(PROPERTY_EDGE_USE_ARROW, DEFAULT_EDGE_USE_ARROW);
-    }
+    public boolean getUseEdgeArrow() { return getBooleanProperty(PROPERTY_EDGE_USE_ARROW, DEFAULT_EDGE_USE_ARROW); }
 
     /**
      * Returns a property that indicates the size of the {@link SmartArrow}.
      * 
      * @return corresponding property value
      */
-    public double getEdgeArrowSize() {
-        return getDoubleProperty(PROPERTY_ARROW_SIZE, DEFAULT_ARROW_SIZE);
-    }
+    public double getEdgeArrowSize() { return getDoubleProperty(PROPERTY_ARROW_SIZE, DEFAULT_ARROW_SIZE); }
 
     private double getDoubleProperty(String propertyName, double defaultValue) {
         String p = properties.getProperty(propertyName, Double.toString(defaultValue));

@@ -23,6 +23,8 @@
  */
 package dev.vepo.openjgraph.graphview;
 
+import static java.util.Objects.nonNull;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -57,13 +59,11 @@ public class SmartCircularSortedPlacementStrategy implements SmartPlacementStrat
 
             if (first) {
                 // verify the smallest width and height.
-                if (width > height)
-                    p = new Point2D(center.getX(),
-                                    center.getY() - height / 2 + vertex.getRadius() * 2);
-                else
-                    p = new Point2D(center.getX(),
-                                    center.getY() - width / 2 + vertex.getRadius() * 2);
-
+                if (width > height) {
+                    p = new Point2D(center.getX(), center.getY() - height / 2 + vertex.getRadius() * 2);
+                } else {
+                    p = new Point2D(center.getX(), center.getY() - width / 2 + vertex.getRadius() * 2);
+                }
                 first = false;
             } else {
                 p = UtilitiesPoint2D.rotate(p, center, angleIncrement);
@@ -81,7 +81,6 @@ public class SmartCircularSortedPlacementStrategy implements SmartPlacementStrat
      * @param <V> the type of the element stored at the vertices
      */
     protected <V, E> Collection<SmartGraphVertex<V, E>> sort(Collection<? extends SmartGraphVertex<V, E>> vertices) {
-
         List<SmartGraphVertex<V, E>> list = new ArrayList<>(vertices);
 
         list.sort((v1, v2) -> {
@@ -94,21 +93,23 @@ public class SmartCircularSortedPlacementStrategy implements SmartPlacementStrat
     }
 
     private <V> String getVertexElementLabel(V vertex) {
-
-        try {
-            Class<?> clazz = vertex.getClass();
-            for (Method method : clazz.getDeclaredMethods()) {
-                if (method.isAnnotationPresent(SmartLabelSource.class)) {
-                    method.setAccessible(true);
-                    Object value = method.invoke(vertex);
-                    return value.toString();
+        if (nonNull(vertex)) {
+            try {
+                Class<?> clazz = vertex.getClass();
+                for (Method method : clazz.getDeclaredMethods()) {
+                    if (method.isAnnotationPresent(SmartLabelSource.class)) {
+                        method.setAccessible(true);
+                        Object value = method.invoke(vertex);
+                        return value.toString();
+                    }
                 }
+            } catch (SecurityException | IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException | NullPointerException ex) {
+                Logger.getLogger(SmartGraphPanel.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
             }
-        } catch (SecurityException | IllegalAccessException | IllegalArgumentException
-                | InvocationTargetException | NullPointerException ex) {
-            Logger.getLogger(SmartGraphPanel.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+            return vertex.toString();
+        } else {
+            return "<NULL>";
         }
-
-        return vertex != null ? vertex.toString() : "<NULL>";
     }
 }
