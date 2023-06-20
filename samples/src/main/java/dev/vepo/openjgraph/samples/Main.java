@@ -92,7 +92,7 @@ public class Main extends Application {
         /*
         Bellow you can see how to attach actions for when vertices and edges are double-clicked
          */        
-        graphView.setVertexDoubleClickAction((SmartGraphVertex<String> graphVertex) -> {
+        graphView.setVertexDoubleClickAction((SmartGraphVertex<String, String> graphVertex) -> {
             System.out.println("Vertex contains element: " + graphVertex.getUnderlyingVertex().element());
                       
             //toggle different styling
@@ -241,8 +241,8 @@ public class Main extends Application {
                 String id = String.format("%02d", ++count);
                 if (random.nextInt(3) < 2) {
                     //add a new vertex connected to a random existing vertex
-                    Vertex<String> existing = get_random_vertex(g);
-                    Vertex<String> vertexId = g.insertVertex(("V" + id));
+                    Vertex<String, String> existing = get_random_vertex(g);
+                    Vertex<String, String> vertexId = g.insertVertex(("V" + id));
                     g.insertEdge(existing, vertexId, ("E" + id));
                     
                     //this variant must be called to ensure the view has reflected the
@@ -255,8 +255,8 @@ public class Main extends Application {
                         stylableVertex.setStyle("-fx-fill: orange;");
                     }
                 } else {
-                    Vertex<String> existing1 = get_random_vertex(g);
-                    Vertex<String> existing2 = get_random_vertex(g);
+                    Vertex<String, String> existing1 = get_random_vertex(g);
+                    Vertex<String, String> existing2 = get_random_vertex(g);
                     g.insertEdge(existing1, existing2, ("E" + id));
                     
                     graphView.update();
@@ -269,13 +269,13 @@ public class Main extends Application {
         new Thread(r).start();
     }
 
-    private static Vertex<String> get_random_vertex(Graph<String, String> g) {
+    private static Vertex<String, String> get_random_vertex(Graph<String, String> g) {
 
         int size = g.numVertices();
         int rand = random.nextInt(size);
-        Vertex<String> existing = null;
+        Vertex<String, String> existing = null;
         int i = 0;
-        for (Vertex<String> v : g.vertices()) {
+        for (Vertex<String, String> v : g.vertices()) {
             existing = v;
             if (i++ == rand) {
                 break;

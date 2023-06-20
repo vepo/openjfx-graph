@@ -24,8 +24,11 @@
 
 package dev.vepo.openjgraph.graph;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +51,7 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
      * inner classes are defined at the end of the class, so are the auxiliary
      * methods
      */
-    private final Map<V, Vertex<V>> vertices;
+    private final Map<V, Vertex<V, E>> vertices;
     private final Map<E, Edge<E, V>> edges;
 
     public DigraphEdgeList() {
@@ -57,7 +60,10 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
     }
 
     @Override
-    public synchronized Collection<Edge<E, V>> incidentEdges(Vertex<V> inbound) throws InvalidVertexException {
+    public boolean hasVertex(Vertex<V, E> source) { return vertices.containsValue(source); }
+
+    @Override
+    public synchronized Collection<Edge<E, V>> incidentEdges(Vertex<V, E> inbound) throws InvalidVertexException {
         checkVertex(inbound);
 
         List<Edge<E, V>> incidentEdges = new ArrayList<>();
@@ -71,7 +77,7 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
     }
 
     @Override
-    public synchronized Collection<Edge<E, V>> outboundEdges(Vertex<V> outbound) throws InvalidVertexException {
+    public synchronized Collection<Edge<E, V>> outboundEdges(Vertex<V, E> outbound) throws InvalidVertexException {
         checkVertex(outbound);
 
         List<Edge<E, V>> outboundEdges = new ArrayList<>();
@@ -85,7 +91,7 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
     }
 
     @Override
-    public boolean areAdjacent(Vertex<V> outbound, Vertex<V> inbound) throws InvalidVertexException {
+    public boolean areAdjacent(Vertex<V, E> outbound, Vertex<V, E> inbound) throws InvalidVertexException {
         // we allow loops, so we do not check if outbound == inbound
         checkVertex(outbound);
         checkVertex(inbound);
@@ -100,29 +106,21 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
     }
 
     @Override
-    public boolean areAdjacent(V outbound, V inbound) throws InvalidVertexException {
-        return areAdjacent(vertices.get(outbound), vertices.get(inbound));
-    }
+    public boolean areAdjacent(V outbound, V inbound) throws InvalidVertexException { return areAdjacent(vertices.get(outbound), vertices.get(inbound)); }
 
     @Override
-    public synchronized Edge<E, V> insertEdge(Vertex<V> outbound, Vertex<V> inbound, E edgeElement)
-            throws InvalidVertexException, InvalidEdgeException {
-        if (existsEdgeWith(edgeElement)) {
-            throw new InvalidEdgeException("There's already an edge with this element.");
-        }
+    public synchronized Edge<E, V> insertEdge(Vertex<V, E> outbound, Vertex<V, E> inbound, E edgeElement) throws InvalidVertexException, InvalidEdgeException {
+        var outVertex = checkVertex(outbound);
+        var inVertex = checkVertex(inbound);
 
-        Vertex<V> outVertex = checkVertex(outbound);
-        Vertex<V> inVertex = checkVertex(inbound);
-
-        Edge<E, V> newEdge = new Edge<>(outVertex, inVertex, true, 1.0, edgeElement);
-
+        var newEdge = new Edge<>(outVertex, inVertex, true, 1.0, edgeElement);
         edges.put(edgeElement, newEdge);
 
         return newEdge;
     }
 
     @Override
-    public synchronized Edge<E, V> insertEdge(V outboundElement, V inboundElement, E edgeElement)
+    public synchronized Edge<E, V> insertEdge(V outboundElement, V inboundElement, E edgeElement, double weight)
             throws InvalidVertexException, InvalidEdgeException {
         if (existsEdgeWith(edgeElement)) {
             throw new InvalidEdgeException("There's already an edge with this element.");
@@ -135,10 +133,10 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
             throw new InvalidVertexException("No vertex contains " + inboundElement);
         }
 
-        Vertex<V> outVertex = vertexOf(outboundElement);
-        Vertex<V> inVertex = vertexOf(inboundElement);
+        var outVertex = vertexOf(outboundElement);
+        var inVertex = vertexOf(inboundElement);
 
-        Edge<E, V> newEdge = new Edge<E, V>(outVertex, inVertex, true, 1.0, edgeElement);
+        var newEdge = new Edge<E, V>(outVertex, inVertex, true, weight, edgeElement);
 
         edges.put(edgeElement, newEdge);
 
@@ -146,32 +144,27 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
     }
 
     @Override
-    public int numVertices() {
-        return vertices.size();
+    public synchronized Edge<E, V> insertEdge(V outboundElement, V inboundElement, E edgeElement) throws InvalidVertexException, InvalidEdgeException {
+        return insertEdge(outboundElement, inboundElement, edgeElement, 1.0);
     }
 
     @Override
-    public int numEdges() {
-        return edges.size();
-    }
+    public int numVertices() { return vertices.size(); }
 
     @Override
-    public boolean hasEdge(E e) {
-        return existsEdgeWith(e);
-    }
+    public int numEdges() { return edges.size(); }
 
     @Override
-    public synchronized Collection<Vertex<V>> vertices() {
-        return new ArrayList<>(vertices.values());
-    }
+    public boolean hasEdge(E e) { return existsEdgeWith(e); }
 
     @Override
-    public synchronized Collection<Edge<E, V>> edges() {
-        return new ArrayList<>(edges.values());
-    }
+    public synchronized Collection<Vertex<V, E>> vertices() { return new ArrayList<>(vertices.values()); }
 
     @Override
-    public synchronized Vertex<V> opposite(Vertex<V> v, Edge<E, V> e)
+    public synchronized Collection<Edge<E, V>> edges() { return new ArrayList<>(edges.values()); }
+
+    @Override
+    public synchronized Vertex<V, E> opposite(Vertex<V, E> v, Edge<E, V> e)
             throws InvalidVertexException, InvalidEdgeException {
         checkVertex(v);
         Edge<E, V> edge = checkEdge(e);
@@ -189,12 +182,15 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
     }
 
     @Override
-    public synchronized Vertex<V> insertVertex(V vElement) throws InvalidVertexException {
+    public Vertex<V, E> opposite(V v, E e) throws InvalidVertexException, InvalidEdgeException { return opposite(vertexOf(v), edges.get(e)); }
+
+    @Override
+    public synchronized Vertex<V, E> insertVertex(V vElement) throws InvalidVertexException {
         if (existsVertexWith(vElement)) {
             throw new InvalidVertexException("There's already a vertex with this element.");
         }
 
-        Vertex<V> newVertex = new Vertex<>(vElement);
+        var newVertex = new Vertex<>(vElement, this);
 
         vertices.put(vElement, newVertex);
 
@@ -202,7 +198,7 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
     }
 
     @Override
-    public synchronized V removeVertex(Vertex<V> v) throws InvalidVertexException {
+    public synchronized V removeVertex(Vertex<V, E> v) throws InvalidVertexException {
         checkVertex(v);
 
         V element = v.element();
@@ -240,15 +236,28 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
     }
 
     @Override
-    public V replace(Vertex<V> v, V newElement) throws InvalidVertexException {
+    public V replace(Vertex<V, E> v, V newElement) throws InvalidVertexException {
         if (existsVertexWith(newElement)) {
             throw new InvalidVertexException("There's already a vertex with this element.");
         }
 
-        Vertex<V> vertex = checkVertex(v);
-
+        var vertex = checkVertex(v);
+        var newVertex = new Vertex<>(newElement, this);
         V oldElement = vertex.element();
-        vertices.replace(oldElement, vertex, new Vertex<V>(newElement));
+
+        vertices.remove(oldElement);
+        vertices.put(newElement, newVertex);
+        var allEdges = edges.values().stream().filter(e -> e.contains(vertex)).collect(toList());
+        allEdges.forEach(e -> {
+            edges.remove(e);
+            if (e.vertexA().equals(vertex)) {
+                edges.replace(e.element(),
+                              new Edge<E, V>(newVertex, e.vertexB(), e.directed(), e.weight(), e.element()));
+            } else {
+                edges.replace(e.element(),
+                              new Edge<E, V>(e.vertexA(), newVertex, e.directed(), e.weight(), e.element()));
+            }
+        });
 
         return oldElement;
     }
@@ -259,39 +268,25 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
             throw new InvalidEdgeException("There's already an edge with this element.");
         }
 
-        Edge<E, V> edge = checkEdge(e);
+        var edge = checkEdge(e);
 
-        // E oldElement = edge.element;
-        // edge.element = newElement;
-        //
-        // return oldElement;
-        return null;
-    }
+        var newEdge = new Edge<>(e.vertexA(), e.vertexB(), e.directed(), e.weight(), newElement);
 
-    private Vertex<V> vertexOf(V vElement) {
-        for (Vertex<V> v : vertices.values()) {
-            if (v.element().equals(vElement)) {
-                return (Vertex<V>) v;
-            }
-        }
-        return null;
-    }
+        edges.remove(e.element());
+        edges.put(newElement, newEdge);
 
-    private boolean existsVertexWith(V vElement) {
-        return vertices.containsKey(vElement);
-    }
-
-    private boolean existsEdgeWith(E edgeElement) {
-        return edges.containsKey(edgeElement);
+        return edge.element();
     }
 
     @Override
+    public Optional<Vertex<V, E>> vertex(V value) { return vertices.containsKey(value) ? Optional.of(vertices.get(value)) : Optional.empty(); }
+
+    @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(String.format("Graph with %d vertices and %d edges:\n", numVertices(),
-                                                           numEdges()));
+        StringBuilder sb = new StringBuilder(String.format("Graph with %d vertices and %d edges:\n", numVertices(), numEdges()));
 
         sb.append("--- Vertices: \n");
-        for (Vertex<V> v : vertices.values()) {
+        for (Vertex<V, E> v : vertices.values()) {
             sb.append("\t").append(v.toString()).append("\n");
         }
         sb.append("\n--- Edges: \n");
@@ -300,6 +295,19 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
         }
         return sb.toString();
     }
+
+    private Vertex<V, E> vertexOf(V vElement) {
+        for (Vertex<V, E> v : vertices.values()) {
+            if (v.element().equals(vElement)) {
+                return (Vertex<V, E>) v;
+            }
+        }
+        return null;
+    }
+
+    private boolean existsVertexWith(V vElement) { return vertices.containsKey(vElement); }
+
+    private boolean existsEdgeWith(E edgeElement) { return edges.containsKey(edgeElement); }
 
     /**
      * Checks whether a given vertex is valid and belongs to this graph.
@@ -310,13 +318,14 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
      * @throws InvalidVertexException if the vertex is <code>null</code> or does not
      *                                belong to this graph
      */
-    private Vertex<V> checkVertex(Vertex<V> v) throws InvalidVertexException {
-        if (v == null)
+    private Vertex<V, E> checkVertex(Vertex<V, E> v) throws InvalidVertexException {
+        if (v == null) {
             throw new InvalidVertexException("Null vertex.");
+        }
 
-        Vertex<V> vertex;
+        Vertex<V, E> vertex;
         try {
-            vertex = (Vertex<V>) v;
+            vertex = (Vertex<V, E>) v;
         } catch (ClassCastException e) {
             throw new InvalidVertexException("Not a vertex.");
         }
@@ -329,8 +338,9 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
     }
 
     private Edge<E, V> checkEdge(Edge<E, V> e) throws InvalidEdgeException {
-        if (e == null)
+        if (e == null) {
             throw new InvalidEdgeException("Null edge.");
+        }
 
         Edge<E, V> edge;
         try {
@@ -344,6 +354,14 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
         }
 
         return edge;
+    }
+
+    public Optional<Edge<E, V>> edge(Vertex<V, E> vertexA, Vertex<V, E> vertexB) {
+        return edges.values()
+                    .stream()
+                    .filter(e -> e.vertexA().equals(vertexA) && e.vertexB().equals(vertexB))
+                    .sorted(Comparator.comparingDouble(Edge::weight))
+                    .findFirst();
     }
 
 }

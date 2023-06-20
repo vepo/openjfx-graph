@@ -35,8 +35,8 @@ import dev.vepo.openjgraph.graph.Graph;
 import javafx.geometry.Point2D;
 
 /**
- * Places vertices around a circle, ordered by the underlying
- * vertices {@code element.toString() value}.
+ * Places vertices around a circle, ordered by the underlying vertices
+ * {@code element.toString() value}.
  * 
  * @see SmartPlacementStrategy
  * 
@@ -45,24 +45,24 @@ import javafx.geometry.Point2D;
 public class SmartCircularSortedPlacementStrategy implements SmartPlacementStrategy {
 
     @Override
-    public <V, E> void place(double width, double height, Graph<V, E> theGraph, Collection<? extends SmartGraphVertex<V>> vertices) {
+    public <V, E> void place(double width, double height, Graph<V, E> theGraph, Collection<? extends SmartGraphVertex<V, E>> vertices) {
         Point2D center = new Point2D(width / 2, height / 2);
         int N = vertices.size();
         double angleIncrement = -360f / N;
-        
-        //place first vertex at north position, others in clockwise manner
+
+        // place first vertex at north position, others in clockwise manner
         boolean first = true;
         Point2D p = null;
-        for (SmartGraphVertex<V> vertex : sort(vertices)) {
-            
+        for (SmartGraphVertex<V, E> vertex : sort(vertices)) {
+
             if (first) {
-                //verify the smallest width and height.
-                if(width > height)
+                // verify the smallest width and height.
+                if (width > height)
                     p = new Point2D(center.getX(),
-                            center.getY() - height / 2 + vertex.getRadius() * 2);
+                                    center.getY() - height / 2 + vertex.getRadius() * 2);
                 else
                     p = new Point2D(center.getX(),
-                            center.getY() - width / 2 + vertex.getRadius() * 2);
+                                    center.getY() - width / 2 + vertex.getRadius() * 2);
 
                 first = false;
             } else {
@@ -75,20 +75,21 @@ public class SmartCircularSortedPlacementStrategy implements SmartPlacementStrat
 
     /**
      * Sort vertices by their element's label.
+     * 
      * @param vertices collection of vertices to sort
      * @return a new collection with sorted vertices
      * @param <V> the type of the element stored at the vertices
      */
-    protected <V> Collection<SmartGraphVertex<V>> sort(Collection<? extends SmartGraphVertex<V>> vertices) {
-        
-        List<SmartGraphVertex<V>> list = new ArrayList<>(vertices);
+    protected <V, E> Collection<SmartGraphVertex<V, E>> sort(Collection<? extends SmartGraphVertex<V, E>> vertices) {
 
-        list.sort( (v1, v2) -> {
+        List<SmartGraphVertex<V, E>> list = new ArrayList<>(vertices);
+
+        list.sort((v1, v2) -> {
             V element1 = v1.getUnderlyingVertex().element();
             V element2 = v2.getUnderlyingVertex().element();
             return getVertexElementLabel(element1).compareToIgnoreCase(getVertexElementLabel(element2));
         });
-        
+
         return list;
     }
 
@@ -104,7 +105,7 @@ public class SmartCircularSortedPlacementStrategy implements SmartPlacementStrat
                 }
             }
         } catch (SecurityException | IllegalAccessException | IllegalArgumentException
-                 | InvocationTargetException | NullPointerException ex) {
+                | InvocationTargetException | NullPointerException ex) {
             Logger.getLogger(SmartGraphPanel.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
         }
 

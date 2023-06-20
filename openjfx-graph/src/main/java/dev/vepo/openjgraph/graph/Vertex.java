@@ -32,5 +32,8 @@ package dev.vepo.openjgraph.graph;
  * @see Graph
  * @see Digraph
  */
-public record Vertex<V>(V element) {
+public record Vertex<V, E>(V element, Graph<V, E> graph) {
+
+    @Override
+    public String toString() { return String.format("Vertex [element=%s]", element); }
 }

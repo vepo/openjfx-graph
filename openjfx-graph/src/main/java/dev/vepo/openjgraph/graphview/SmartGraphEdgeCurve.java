@@ -31,18 +31,16 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 
 /**
- * Concrete implementation of a curved edge.
- * <br>
+ * Concrete implementation of a curved edge. <br>
  * The edge binds its start point to the <code>outbound</code>
  * {@link SmartGraphVertexNode} center and its end point to the
  * <code>inbound</code> {@link SmartGraphVertexNode} center. As such, the curve
- * is updated automatically as the vertices move.
- * <br>
+ * is updated automatically as the vertices move. <br>
  * Given there can be several curved edges connecting two vertices, when calling
- * the constructor {@link #SmartGraphEdgeCurve(Edge,
- * SmartGraphVertexNode,
- * SmartGraphVertexNode, int) } the <code>edgeIndex</code>
- * can be specified as to create non-overlapping curves.
+ * the constructor
+ * {@link #SmartGraphEdgeCurve(Edge, SmartGraphVertexNode, SmartGraphVertexNode, int) }
+ * the <code>edgeIndex</code> can be specified as to create non-overlapping
+ * curves.
  *
  * @param <E> Type stored in the underlying edge
  * @param <V> Type of connecting vertex
@@ -55,22 +53,20 @@ public class SmartGraphEdgeCurve<E, V> extends CubicCurve implements SmartGraphE
 
     private final Edge<E, V> underlyingEdge;
 
-    private final SmartGraphVertexNode<V> inbound;
-    private final SmartGraphVertexNode<V> outbound;
+    private final SmartGraphVertexNode<V, E> inbound;
+    private final SmartGraphVertexNode<V, E> outbound;
 
     private SmartLabel attachedLabel = null;
     private SmartArrow attachedArrow = null;
 
     private double randomAngleFactor = 0;
-    
+
     /* Styling proxy */
     private final SmartStyleProxy styleProxy;
 
-    public SmartGraphEdgeCurve(Edge<E, V> edge, SmartGraphVertexNode<V> inbound, SmartGraphVertexNode<V> outbound) {
-        this(edge, inbound, outbound, 0);
-    }
+    public SmartGraphEdgeCurve(Edge<E, V> edge, SmartGraphVertexNode<V, E> inbound, SmartGraphVertexNode<V, E> outbound) { this(edge, inbound, outbound, 0); }
 
-    public SmartGraphEdgeCurve(Edge<E, V> edge, SmartGraphVertexNode<V> inbound, SmartGraphVertexNode<V> outbound, int edgeIndex) {
+    public SmartGraphEdgeCurve(Edge<E, V> edge, SmartGraphVertexNode<V, E> inbound, SmartGraphVertexNode<V, E> outbound, int edgeIndex) {
         this.inbound = inbound;
         this.outbound = outbound;
 
@@ -79,52 +75,46 @@ public class SmartGraphEdgeCurve<E, V> extends CubicCurve implements SmartGraphE
         styleProxy = new SmartStyleProxy(this);
         styleProxy.addStyleClass("edge");
 
-        //bind start and end positions to vertices centers through properties
+        // bind start and end positions to vertices centers through properties
         this.startXProperty().bind(outbound.centerXProperty());
         this.startYProperty().bind(outbound.centerYProperty());
         this.endXProperty().bind(inbound.centerXProperty());
         this.endYProperty().bind(inbound.centerYProperty());
 
-        //TODO: improve this solution taking into account even indices, etc.
-        randomAngleFactor = edgeIndex == 0 ? 0 : 1.0 / edgeIndex; //Math.random();
+        // TODO: improve this solution taking into account even indices, etc.
+        randomAngleFactor = edgeIndex == 0 ? 0 : 1.0 / edgeIndex; // Math.random();
 
-        //update();
+        // update();
         enableListeners();
     }
 
     @Override
-    public void setStyleClass(String cssClass) {
-        styleProxy.setStyleClass(cssClass);
-    }
+    public void setStyleClass(String cssClass) { styleProxy.setStyleClass(cssClass); }
 
     @Override
-    public void addStyleClass(String cssClass) {
-        styleProxy.addStyleClass(cssClass);
-    }
+    public void addStyleClass(String cssClass) { styleProxy.addStyleClass(cssClass); }
 
     @Override
-    public boolean removeStyleClass(String cssClass) {
-        return styleProxy.removeStyleClass(cssClass);
-    }
-    
-    private void update() {                
+    public boolean removeStyleClass(String cssClass) { return styleProxy.removeStyleClass(cssClass); }
+
+    private void update() {
         if (inbound == outbound) {
             /* Make a loop using the control points proportional to the vertex radius */
-            
-            //TODO: take into account several "self-loops" with randomAngleFactor
+
+            // TODO: take into account several "self-loops" with randomAngleFactor
             double midpointX1 = outbound.getCenterX() - inbound.getRadius() * 5;
             double midpointY1 = outbound.getCenterY() - inbound.getRadius() * 2;
-            
+
             double midpointX2 = outbound.getCenterX() + inbound.getRadius() * 5;
             double midpointY2 = outbound.getCenterY() - inbound.getRadius() * 2;
-            
+
             setControlX1(midpointX1);
             setControlY1(midpointY1);
             setControlX2(midpointX2);
             setControlY2(midpointY2);
-            
-        } else {          
-            /* Make a curved edge. The curve is proportional to the distance  */
+
+        } else {
+            /* Make a curved edge. The curve is proportional to the distance */
             double midpointX = (outbound.getCenterX() + inbound.getCenterX()) / 2;
             double midpointY = (outbound.getCenterY() + inbound.getCenterY()) / 2;
 
@@ -133,18 +123,19 @@ public class SmartGraphEdgeCurve<E, V> extends CubicCurve implements SmartGraphE
             Point2D startpoint = new Point2D(inbound.getCenterX(), inbound.getCenterY());
             Point2D endpoint = new Point2D(outbound.getCenterX(), outbound.getCenterY());
 
-            //TODO: improvement lower max_angle_placement according to distance between vertices
+            // TODO: improvement lower max_angle_placement according to distance between
+            // vertices
             double angle = MAX_EDGE_CURVE_ANGLE;
 
             double distance = startpoint.distance(endpoint);
 
-            //TODO: remove "magic number" 1500 and provide a distance function for the 
-            //decreasing angle with distance
+            // TODO: remove "magic number" 1500 and provide a distance function for the
+            // decreasing angle with distance
             angle = angle - (distance / 1500 * angle);
 
             midpoint = UtilitiesPoint2D.rotate(midpoint,
-                    startpoint,
-                    (-angle) + randomAngleFactor * (angle - (-angle)));
+                                               startpoint,
+                                               (-angle) + randomAngleFactor * (angle - (-angle)));
 
             setControlX1(midpoint.getX());
             setControlY1(midpoint.getY());
@@ -155,9 +146,9 @@ public class SmartGraphEdgeCurve<E, V> extends CubicCurve implements SmartGraphE
     }
 
     /*
-    With a curved edge we need to continuously update the control points.
-    TODO: Maybe we can achieve this solely with bindings.
-    */
+     * With a curved edge we need to continuously update the control points. TODO:
+     * Maybe we can achieve this solely with bindings.
+     */
     private void enableListeners() {
         this.startXProperty().addListener((ObservableValue<? extends Number> ov, Number t, Number t1) -> {
             update();
@@ -181,14 +172,10 @@ public class SmartGraphEdgeCurve<E, V> extends CubicCurve implements SmartGraphE
     }
 
     @Override
-    public SmartLabel getAttachedLabel() {
-        return attachedLabel;
-    }
+    public SmartLabel getAttachedLabel() { return attachedLabel; }
 
     @Override
-    public Edge<E, V> getUnderlyingEdge() {
-        return underlyingEdge;
-    }
+    public Edge<E, V> getUnderlyingEdge() { return underlyingEdge; }
 
     @Override
     public void attachArrow(SmartArrow arrow) {
@@ -203,9 +190,8 @@ public class SmartGraphEdgeCurve<E, V> extends CubicCurve implements SmartGraphE
         rotation.pivotXProperty().bind(translateXProperty());
         rotation.pivotYProperty().bind(translateYProperty());
         rotation.angleProperty().bind(UtilitiesBindings.toDegrees(
-                UtilitiesBindings.atan2(endYProperty().subtract(controlY2Property()),
-                        endXProperty().subtract(controlX2Property()))
-        ));
+                                                                  UtilitiesBindings.atan2(endYProperty().subtract(controlY2Property()),
+                                                                                          endXProperty().subtract(controlX2Property()))));
 
         arrow.getTransforms().add(rotation);
 
@@ -215,17 +201,11 @@ public class SmartGraphEdgeCurve<E, V> extends CubicCurve implements SmartGraphE
     }
 
     @Override
-    public SmartArrow getAttachedArrow() {
-        return this.attachedArrow;
-    }
-    
-    @Override
-    public SmartStylableNode getStylableArrow() {
-        return this.attachedArrow;
-    }
+    public SmartArrow getAttachedArrow() { return this.attachedArrow; }
 
     @Override
-    public SmartStylableNode getStylableLabel() {
-        return this.attachedLabel;
-    }
+    public SmartStylableNode getStylableArrow() { return this.attachedArrow; }
+
+    @Override
+    public SmartStylableNode getStylableLabel() { return this.attachedLabel; }
 }

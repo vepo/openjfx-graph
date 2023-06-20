@@ -36,12 +36,10 @@ import dev.vepo.openjgraph.graph.Vertex;
 
 /**
  * Internal implementation of a graph vertex for the {@link SmartGraphPanel}
- * class.
- * <br>
- * Visually it depicts a vertex as a circle, extending from {@link Circle}.
- * <br>
- * The vertex internally deals with mouse drag events that visually move
- * it in the {@link SmartGraphPanel} when displayed, if parameterized to do so.
+ * class. <br>
+ * Visually it depicts a vertex as a circle, extending from {@link Circle}. <br>
+ * The vertex internally deals with mouse drag events that visually move it in
+ * the {@link SmartGraphPanel} when displayed, if parameterized to do so.
  *
  * @param <T> the type of the underlying vertex
  *
@@ -49,35 +47,38 @@ import dev.vepo.openjgraph.graph.Vertex;
  *
  * @author brunomnsilva
  */
-public class SmartGraphVertexNode<T> extends Circle implements SmartGraphVertex<T>, SmartLabelledNode {
+public class SmartGraphVertexNode<T, E> extends Circle implements SmartGraphVertex<T, E>, SmartLabelledNode {
 
-    private final Vertex<T> underlyingVertex;
+    private final Vertex<T, E> underlyingVertex;
 
-    /* Critical for performance, so we don't rely on the efficiency of the Graph.areAdjacent method */
-    private final Set<SmartGraphVertexNode<T>> adjacentVertices;
+    /*
+     * Critical for performance, so we don't rely on the efficiency of the
+     * Graph.areAdjacent method
+     */
+    private final Set<SmartGraphVertexNode<T, E>> adjacentVertices;
 
     private SmartLabel attachedLabel = null;
     private boolean isDragging = false;
 
     /*
-    Automatic layout functionality members
+     * Automatic layout functionality members
      */
     private final PointVector forceVector = new PointVector(0, 0);
     private final PointVector updatedPosition = new PointVector(0, 0);
 
     /* Styling proxy */
     private final SmartStyleProxy styleProxy;
-    
+
     /**
      * Constructor which sets the instance attributes.
      *
-     * @param v the underlying vertex
-     * @param x initial x position on the parent pane
-     * @param y initial y position on the parent pane
-     * @param radius radius of this vertex representation, i.e., a circle
+     * @param v         the underlying vertex
+     * @param x         initial x position on the parent pane
+     * @param y         initial y position on the parent pane
+     * @param radius    radius of this vertex representation, i.e., a circle
      * @param allowMove should the vertex be draggable with the mouse
      */
-    public SmartGraphVertexNode(Vertex<T> v, double x, double y, double radius, boolean allowMove) {
+    public SmartGraphVertexNode(Vertex<T, E> v, double x, double y, double radius, boolean allowMove) {
         super(x, y, radius);
 
         this.underlyingVertex = v;
@@ -93,15 +94,13 @@ public class SmartGraphVertexNode<T> extends Circle implements SmartGraphVertex<
             enableDrag();
         }
     }
-    
+
     /**
      * Adds a vertex to the internal list of adjacent vertices.
      *
      * @param v vertex to add
      */
-    public void addAdjacentVertex(SmartGraphVertexNode<T> v) {
-        this.adjacentVertices.add(v);
-    }
+    public void addAdjacentVertex(SmartGraphVertexNode<T, E> v) { this.adjacentVertices.add(v); }
 
     /**
      * Removes a vertex from the internal list of adjacent vertices.
@@ -109,20 +108,15 @@ public class SmartGraphVertexNode<T> extends Circle implements SmartGraphVertex<
      * @param v vertex to remove
      * @return true if <code>v</code> existed; false otherwise.
      */
-    public boolean removeAdjacentVertex(SmartGraphVertexNode<T> v) {
-        return this.adjacentVertices.remove(v);
-    }
+    public boolean removeAdjacentVertex(SmartGraphVertexNode<T, E> v) { return this.adjacentVertices.remove(v); }
 
     /**
-     * Removes a collection of vertices from the internal list of adjacent
-     * vertices.
+     * Removes a collection of vertices from the internal list of adjacent vertices.
      *
      * @param col collection of vertices
      * @return true if any vertex was effectively removed
      */
-    public boolean removeAdjacentVertices(Collection<SmartGraphVertexNode<T>> col) {
-        return this.adjacentVertices.removeAll(col);
-    }
+    public boolean removeAdjacentVertices(Collection<SmartGraphVertexNode<T, E>> col) { return this.adjacentVertices.removeAll(col); }
 
     /**
      * Checks whether <code>v</code> is adjacent this instance.
@@ -130,18 +124,14 @@ public class SmartGraphVertexNode<T> extends Circle implements SmartGraphVertex<
      * @param v vertex to check
      * @return true if adjacent; false otherwise
      */
-    public boolean isAdjacentTo(SmartGraphVertexNode<T> v) {
-        return this.adjacentVertices.contains(v);
-    }
+    public boolean isAdjacentTo(SmartGraphVertexNode<T, E> v) { return this.adjacentVertices.contains(v); }
 
     /**
      * Returns the current position of the instance in pixels.
      *
      * @return the x,y coordinates in pixels
      */
-    public Point2D getPosition() {
-        return new Point2D(getCenterX(), getCenterY());
-    }
+    public Point2D getPosition() { return new Point2D(getCenterX(), getCenterY()); }
 
     /**
      * Sets the position of the instance in pixels.
@@ -158,26 +148,19 @@ public class SmartGraphVertexNode<T> extends Circle implements SmartGraphVertex<
         setCenterX(x);
         setCenterY(y);
     }
-    
-     @Override
-    public double getPositionCenterX() {
-        return getCenterX();
-    }
 
     @Override
-    public double getPositionCenterY() {
-        return getCenterY();
-    }
+    public double getPositionCenterX() { return getCenterX(); }
 
+    @Override
+    public double getPositionCenterY() { return getCenterY(); }
 
     /**
      * Sets the position of the instance in pixels.
      *
      * @param p coordinates
      */
-    public void setPosition(Point2D p) {
-        setPosition(p.getX(), p.getY());
-    }
+    public void setPosition(Point2D p) { setPosition(p.getX(), p.getY()); }
 
     /**
      * Resets the current computed external force vector.
@@ -207,26 +190,21 @@ public class SmartGraphVertexNode<T> extends Circle implements SmartGraphVertex<
      *
      * @return force vector
      */
-    public Point2D getForceVector() {
-        return new Point2D(forceVector.x, forceVector.y);
-    }
+    public Point2D getForceVector() { return new Point2D(forceVector.x, forceVector.y); }
 
     /**
      * Returns the future position of the vertex.
      *
      * @return future position
      */
-    public Point2D getUpdatedPosition() {
-        return new Point2D(updatedPosition.x, updatedPosition.y);
-    }
+    public Point2D getUpdatedPosition() { return new Point2D(updatedPosition.x, updatedPosition.y); }
 
     /**
-     * Updates the future position according to the current internal force
-     * vector.
+     * Updates the future position according to the current internal force vector.
      *
      */
     public void updateDelta() {
-        updatedPosition.x = updatedPosition.x /* + speed*/ + forceVector.x;
+        updatedPosition.x = updatedPosition.x /* + speed */ + forceVector.x;
         updatedPosition.y = updatedPosition.y + forceVector.y;
     }
 
@@ -238,7 +216,7 @@ public class SmartGraphVertexNode<T> extends Circle implements SmartGraphVertex<
      */
     public void moveFromForces() {
 
-        //limit movement to parent bounds
+        // limit movement to parent bounds
         double height = getParent().getLayoutBounds().getHeight();
         double width = getParent().getLayoutBounds().getWidth();
 
@@ -323,35 +301,22 @@ public class SmartGraphVertexNode<T> extends Circle implements SmartGraphVertex<
     }
 
     @Override
-    public SmartLabel getAttachedLabel() {
-        return attachedLabel;
-    }
+    public SmartLabel getAttachedLabel() { return attachedLabel; }
 
     @Override
-    public Vertex<T> getUnderlyingVertex() {
-        return underlyingVertex;
-    }
-
-     
-    @Override
-    public void setStyleClass(String cssClass) {
-        styleProxy.setStyleClass(cssClass);
-    }
+    public Vertex<T, E> getUnderlyingVertex() { return underlyingVertex; }
 
     @Override
-    public void addStyleClass(String cssClass) {
-        styleProxy.addStyleClass(cssClass);
-    }
+    public void setStyleClass(String cssClass) { styleProxy.setStyleClass(cssClass); }
 
     @Override
-    public boolean removeStyleClass(String cssClass) {
-        return styleProxy.removeStyleClass(cssClass);
-    }
+    public void addStyleClass(String cssClass) { styleProxy.addStyleClass(cssClass); }
 
     @Override
-    public SmartStylableNode getStylableLabel() {
-        return this.attachedLabel;
-    }
+    public boolean removeStyleClass(String cssClass) { return styleProxy.removeStyleClass(cssClass); }
+
+    @Override
+    public SmartStylableNode getStylableLabel() { return this.attachedLabel; }
 
     /**
      * Internal representation of a 2D point or vector for quick access to its

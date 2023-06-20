@@ -23,8 +23,6 @@
  */
 package dev.vepo.openjgraph.graph;
 
-import java.util.stream.Stream;
-
 /**
  * An edge connects two {@link Vertex} of type <code>V</code> and stores an
  * element of type <code>E</code>. <br/>
@@ -36,17 +34,13 @@ import java.util.stream.Stream;
  * @see Graph
  * @see Digraph
  */
-public record Edge<E, V>(Vertex<V> vertexA,
-                         Vertex<V> vertexB,
+public record Edge<E, V>(Vertex<V, E> vertexA,
+                         Vertex<V, E> vertexB,
                          boolean directed,
                          double weight,
                          E element) {
 
-    public boolean contains(Vertex<V> vertex) {
-        return vertexA.equals(vertex) || vertexB.equals(vertex);
-    }
+    public boolean contains(Vertex<V, E> vertex) { return vertexA.equals(vertex) || vertexB.equals(vertex); }
 
-    public String label() {
-        return element.toString();
-    }
+    public String label() { return element.toString(); }
 }

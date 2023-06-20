@@ -27,7 +27,8 @@ import dev.vepo.openjgraph.graph.Graph;
 import dev.vepo.openjgraph.graph.Vertex;
 
 /**
- * Abstracts the internal representation and behavior of a visualized graph vertex.
+ * Abstracts the internal representation and behavior of a visualized graph
+ * vertex.
  * 
  * @param <V> Type stored in the underlying vertex
  * 
@@ -35,49 +36,48 @@ import dev.vepo.openjgraph.graph.Vertex;
  * 
  * @author brunomnsilva
  */
-public interface SmartGraphVertex<V> extends SmartStylableNode {
-    
+public interface SmartGraphVertex<V, E> extends SmartStylableNode {
+
     /**
      * Returns the underlying (stored reference) graph vertex.
      * 
-     * @return vertex reference 
+     * @return vertex reference
      * 
      * @see Graph
      */
-    Vertex<V> getUnderlyingVertex();
-    
+    Vertex<V, E> getUnderlyingVertex();
+
     /**
-     * Sets the position of this vertex in panel coordinates. 
-     * <br/>
-     * Apart from its usage in the {@link SmartGraphPanel}, this method
-     * should only be called when implementing {@link SmartPlacementStrategy}.
+     * Sets the position of this vertex in panel coordinates. <br/>
+     * Apart from its usage in the {@link SmartGraphPanel}, this method should only
+     * be called when implementing {@link SmartPlacementStrategy}.
      * 
-     * @param x     x-coordinate for the vertex
-     * @param y     y-coordinate for the vertex
+     * @param x x-coordinate for the vertex
+     * @param y y-coordinate for the vertex
      */
     void setPosition(double x, double y);
-    
+
     /**
      * Return the center x-coordinate of this vertex in panel coordinates.
      * 
-     * @return     x-coordinate of the vertex 
+     * @return x-coordinate of the vertex
      */
     double getPositionCenterX();
-    
+
     /**
      * Return the center y-coordinate of this vertex in panel coordinates.
      * 
-     * @return     y-coordinate of the vertex 
+     * @return y-coordinate of the vertex
      */
     double getPositionCenterY();
-    
+
     /**
      * Returns the circle radius used to represent this vertex.
      * 
-     * @return      circle radius
+     * @return circle radius
      */
     double getRadius();
-    
+
     /**
      * Returns the label node for further styling.
      * 

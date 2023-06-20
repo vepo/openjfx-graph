@@ -46,12 +46,12 @@ public class ExampleMain extends Application {
         
         Graph<City, Distance> distances = Graph.newGraph();
         
-        Vertex<City> prague = distances.insertVertex(new City("Prague", 1.3f));
-        Vertex<City> tokyo = distances.insertVertex(new City("Tokyo", 37.5f));
-        Vertex<City> beijing = distances.insertVertex(new City("Beijing", 21.5f));
-        Vertex<City> newYork = distances.insertVertex(new City("New York", 19.5f));
-        Vertex<City> london = distances.insertVertex(new City("London", 14.4f));
-        Vertex<City> helsinky = distances.insertVertex(new City("Helsinky", 0.6f));
+        Vertex<City, Distance> prague = distances.insertVertex(new City("Prague", 1.3f));
+        Vertex<City, Distance> tokyo = distances.insertVertex(new City("Tokyo", 37.5f));
+        Vertex<City, Distance> beijing = distances.insertVertex(new City("Beijing", 21.5f));
+        Vertex<City, Distance> newYork = distances.insertVertex(new City("New York", 19.5f));
+        Vertex<City, Distance> london = distances.insertVertex(new City("London", 14.4f));
+        Vertex<City, Distance> helsinky = distances.insertVertex(new City("Helsinky", 0.6f));
         
         distances.insertEdge(tokyo, newYork, new Distance(10838));
         distances.insertEdge(beijing, newYork, new Distance(11550));
