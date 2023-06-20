@@ -23,6 +23,7 @@
  */
 package dev.vepo.openjgraph.graphview;
 
+import static dev.vepo.openjgraph.graphview.UtilitiesPoint2D.rotate;
 import static java.util.Objects.nonNull;
 
 import java.lang.reflect.InvocationTargetException;
@@ -49,14 +50,13 @@ public class SmartCircularSortedPlacementStrategy implements SmartPlacementStrat
     @Override
     public <V, E> void place(double width, double height, Graph<V, E> theGraph, Collection<? extends SmartGraphVertex<V, E>> vertices) {
         Point2D center = new Point2D(width / 2, height / 2);
-        int N = vertices.size();
-        double angleIncrement = -360f / N;
+        int nVertices = vertices.size();
+        double angleIncrement = -360f / nVertices;
 
         // place first vertex at north position, others in clockwise manner
         boolean first = true;
         Point2D p = null;
         for (SmartGraphVertex<V, E> vertex : sort(vertices)) {
-
             if (first) {
                 // verify the smallest width and height.
                 if (width > height) {
@@ -66,7 +66,7 @@ public class SmartCircularSortedPlacementStrategy implements SmartPlacementStrat
                 }
                 first = false;
             } else {
-                p = UtilitiesPoint2D.rotate(p, center, angleIncrement);
+                p = rotate(p, center, angleIncrement);
             }
 
             vertex.setPosition(p.getX(), p.getY());

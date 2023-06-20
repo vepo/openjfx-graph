@@ -52,11 +52,11 @@ public class Path<V, E> implements Subgraph<V, E> {
                 (!edge.directed() && !edge.contains(tail))) {
             throw new IllegalStateException("Edge does not incide over tail!");
         }
-        var edges = new LinkedList<>(this.edges);
-        var vertices = new LinkedList<>(this.vertices);
-        edges.addLast(edge);
-        vertices.addLast(tail.graph().opposite(tail, edge));
-        return new Path<>(vertices, edges);
+        var newEdges = new LinkedList<>(this.edges);
+        var newVertices = new LinkedList<>(this.vertices);
+        newEdges.addLast(edge);
+        newVertices.addLast(tail.graph().opposite(tail, edge));
+        return new Path<>(newVertices, newEdges);
     }
 
     @Override

@@ -23,6 +23,8 @@
  */
 package dev.vepo.openjgraph.graphview;
 
+import static dev.vepo.openjgraph.graphview.UtilitiesPoint2D.rotate;
+
 import dev.vepo.openjgraph.graph.Edge;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Point2D;
@@ -120,22 +122,20 @@ public class SmartGraphEdgeCurve<E, V> extends CubicCurve implements SmartGraphE
 
             Point2D midpoint = new Point2D(midpointX, midpointY);
 
-            Point2D startpoint = new Point2D(inbound.getCenterX(), inbound.getCenterY());
+            Point2D startPoint = new Point2D(inbound.getCenterX(), inbound.getCenterY());
             Point2D endpoint = new Point2D(outbound.getCenterX(), outbound.getCenterY());
 
             // TODO: improvement lower max_angle_placement according to distance between
             // vertices
             double angle = MAX_EDGE_CURVE_ANGLE;
 
-            double distance = startpoint.distance(endpoint);
+            double distance = startPoint.distance(endpoint);
 
             // TODO: remove "magic number" 1500 and provide a distance function for the
             // decreasing angle with distance
             angle = angle - (distance / 1500 * angle);
 
-            midpoint = UtilitiesPoint2D.rotate(midpoint,
-                                               startpoint,
-                                               (-angle) + randomAngleFactor * (angle - (-angle)));
+            midpoint = rotate(midpoint, startPoint, (-angle) + randomAngleFactor * (angle - (-angle)));
 
             setControlX1(midpoint.getX());
             setControlY1(midpoint.getY());
@@ -150,18 +150,10 @@ public class SmartGraphEdgeCurve<E, V> extends CubicCurve implements SmartGraphE
      * Maybe we can achieve this solely with bindings.
      */
     private void enableListeners() {
-        this.startXProperty().addListener((ObservableValue<? extends Number> ov, Number t, Number t1) -> {
-            update();
-        });
-        this.startYProperty().addListener((ObservableValue<? extends Number> ov, Number t, Number t1) -> {
-            update();
-        });
-        this.endXProperty().addListener((ObservableValue<? extends Number> ov, Number t, Number t1) -> {
-            update();
-        });
-        this.endYProperty().addListener((ObservableValue<? extends Number> ov, Number t, Number t1) -> {
-            update();
-        });
+        this.startXProperty().addListener((ov, t, t1) -> update());
+        this.startYProperty().addListener((ov, t, t1) -> update());
+        this.endXProperty().addListener((ov, t, t1) -> update());
+        this.endYProperty().addListener((ov, t, t1) -> update());
     }
 
     @Override
