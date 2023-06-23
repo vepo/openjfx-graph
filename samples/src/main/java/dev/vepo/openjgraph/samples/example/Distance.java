@@ -24,6 +24,7 @@
 
 package dev.vepo.openjgraph.samples.example;
 
+import dev.vepo.openjgraph.graph.Weight;
 import dev.vepo.openjgraph.graphview.SmartLabelSource;
 
 /**
@@ -31,6 +32,7 @@ import dev.vepo.openjgraph.graphview.SmartLabelSource;
  * @author brunomnsilva
  */
 public class Distance {
+    @Weight
     private int distance;
 
     public Distance(int distance) {

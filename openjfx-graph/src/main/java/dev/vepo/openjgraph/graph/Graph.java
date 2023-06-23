@@ -238,6 +238,28 @@ public interface Graph<V, E> {
      * Inserts a new edge with a given element between two existing vertices and
      * return its (the edge's) reference.
      * 
+     * @param u           a vertex
+     * @param v           another vertex
+     * @param edgeElement the element to store in the new edge
+     * @param weight
+     * 
+     * @return the reference for the newly created edge
+     * 
+     * @exception InvalidVertexException if <code>u</code> or <code>v</code> are
+     *                                   invalid vertices for the graph
+     * 
+     * @exception InvalidEdgeException   if there already exists an edge containing
+     *                                   <code>edgeElement</code> according to the
+     *                                   equality of
+     *                                   {@link Object#equals(java.lang.Object) }
+     *                                   method.
+     */
+    Edge<E, V> insertEdge(Vertex<V, E> u, Vertex<V, E> v, E edgeElement, double weight) throws InvalidVertexException, InvalidEdgeException;
+
+    /**
+     * Inserts a new edge with a given element between two existing vertices and
+     * return its (the edge's) reference.
+     * 
      * @param vElement1   a vertex's stored element
      * @param vElement2   another vertex's stored element
      * @param edgeElement the element to store in the new edge

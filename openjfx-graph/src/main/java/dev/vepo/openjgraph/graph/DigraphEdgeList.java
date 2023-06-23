@@ -24,7 +24,7 @@
 
 package dev.vepo.openjgraph.graph;
 
-import static java.util.stream.Collectors.toList;
+import static dev.vepo.openjgraph.graph.ElementInspector.getEdgeWeight;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -110,10 +110,16 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
 
     @Override
     public synchronized Edge<E, V> insertEdge(Vertex<V, E> outbound, Vertex<V, E> inbound, E edgeElement) throws InvalidVertexException, InvalidEdgeException {
+        return insertEdge(outbound, inbound, edgeElement, getEdgeWeight(edgeElement));
+    }
+
+    @Override
+    public synchronized Edge<E, V> insertEdge(Vertex<V, E> outbound, Vertex<V, E> inbound, E edgeElement, double weight)
+            throws InvalidVertexException, InvalidEdgeException {
         var outVertex = checkVertex(outbound);
         var inVertex = checkVertex(inbound);
 
-        var newEdge = new Edge<>(outVertex, inVertex, true, 1.0, edgeElement);
+        var newEdge = new Edge<>(outVertex, inVertex, true, weight, edgeElement);
         edges.put(edgeElement, newEdge);
 
         return newEdge;
@@ -145,7 +151,7 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
 
     @Override
     public synchronized Edge<E, V> insertEdge(V outboundElement, V inboundElement, E edgeElement) throws InvalidVertexException, InvalidEdgeException {
-        return insertEdge(outboundElement, inboundElement, edgeElement, 1.0);
+        return insertEdge(outboundElement, inboundElement, edgeElement, getEdgeWeight(edgeElement));
     }
 
     @Override

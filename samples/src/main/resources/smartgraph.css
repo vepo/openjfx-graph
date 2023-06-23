@@ -26,6 +26,10 @@ This should help you understand which styles you can apply.
     -fx-fill: #B1DFF7;
 }
 
+.vertex.highlight {
+    -fx-fill: #1484C0;
+}
+
 .vertex:hover { /* pseudo-classes also work */
     /*-fx-cursor: default; */ /* You can use this style to override the hand/move cursors while hovering. */
     -fx-stroke-width: 4;
@@ -37,11 +41,17 @@ This should help you understand which styles you can apply.
 
 .edge {
     -fx-stroke-width: 2;
-    -fx-stroke: #FF6D66;  
+    -fx-stroke: #FF6D66;
     -fx-stroke-dash-array: 2 5 2 5; /* remove for clean lines */
     -fx-fill: transparent; /* important to keep for curved edges */
     -fx-stroke-line-cap: round;
     -fx-opacity: 0.8;
+}
+
+.edge.highlight {
+    -fx-stroke-width: 3;
+    -fx-stroke: #CC0A00;
+    -fx-stroke-dash-array: 2 10 2 10; /* remove for clean lines */
 }
 
 .edge-label {
@@ -52,13 +62,4 @@ This should help you understand which styles you can apply.
     -fx-stroke-width: 2;
     -fx-stroke: #FF6D66;  
     -fx-opacity: 0.8;
-}
-
-/* Custom vertex. You should revert any unwanted styling in the default element, 
-   style, since custom styles will be appended to the default style */
-.myVertex {
-    -fx-stroke-width: 4;
-    -fx-stroke: green;
-    -fx-stroke-type: inside; /* you should keep this if using arrows */
-    -fx-fill: yellowgreen;
 }

@@ -1,8 +1,10 @@
 package dev.vepo.openjgraph.graph;
 
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 public class Path<V, E> implements Subgraph<V, E> {
@@ -23,6 +25,8 @@ public class Path<V, E> implements Subgraph<V, E> {
     }
 
     public Vertex<V, E> tail() { return vertices.peekLast(); }
+
+    public Set<Vertex<V, E>> vertices() { return new HashSet<>(vertices); }
 
     @Override
     public boolean contains(Vertex<V, E> vertex) { return vertices.contains(vertex); }

@@ -146,6 +146,30 @@ public interface Digraph<V, E> extends Graph<V, E> {
      * Inserts a new edge with a given element between two existing vertices and
      * return its (the edge's) reference.
      * 
+     * @param outbound    outbound vertex
+     * @param inbound     inbound vertex
+     * @param edgeElement the element to store in the new edge
+     * @param weight
+     * 
+     * @return the reference for the newly created edge
+     * 
+     * @exception InvalidVertexException if <code>outbound</code> or
+     *                                   <code>inbound</code> are invalid vertices
+     *                                   for the graph
+     * 
+     * @exception InvalidEdgeException   if there already exists an edge containing
+     *                                   <code>edgeElement</code> according to the
+     *                                   equality of
+     *                                   {@link Object#equals(java.lang.Object)}
+     *                                   method.
+     */
+    @Override
+    Edge<E, V> insertEdge(Vertex<V, E> outbound, Vertex<V, E> inbound, E edgeElement, double weight) throws InvalidVertexException, InvalidEdgeException;
+
+    /**
+     * Inserts a new edge with a given element between two existing vertices and
+     * return its (the edge's) reference.
+     * 
      * @param outboundElement outbound vertex's stored element
      * @param inboundElement  inbound vertex's stored element
      * @param edgeElement     element to store in the new edge

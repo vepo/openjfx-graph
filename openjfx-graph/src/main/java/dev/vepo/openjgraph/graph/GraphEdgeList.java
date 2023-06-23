@@ -23,7 +23,7 @@
  */
 package dev.vepo.openjgraph.graph;
 
-import static java.util.stream.Collectors.toList;
+import static dev.vepo.openjgraph.graph.ElementInspector.getEdgeWeight;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -142,6 +142,11 @@ class GraphEdgeList<V, E> implements Graph<V, E> {
 
     @Override
     public synchronized Edge<E, V> insertEdge(Vertex<V, E> u, Vertex<V, E> v, E edgeElement) throws InvalidVertexException, InvalidEdgeException {
+        return insertEdge(u, v, edgeElement, getEdgeWeight(edgeElement));
+    }
+
+    @Override
+    public synchronized Edge<E, V> insertEdge(Vertex<V, E> u, Vertex<V, E> v, E edgeElement, double weight) throws InvalidVertexException, InvalidEdgeException {
 
         if (existsEdgeWith(edgeElement)) {
             throw new InvalidEdgeException("There's already an edge with this element.");
@@ -150,7 +155,7 @@ class GraphEdgeList<V, E> implements Graph<V, E> {
         Vertex<V, E> outVertex = checkVertex(u);
         Vertex<V, E> inVertex = checkVertex(v);
 
-        Edge<E, V> newEdge = new Edge<E, V>(outVertex, inVertex, false, 1.0, edgeElement);
+        Edge<E, V> newEdge = new Edge<E, V>(outVertex, inVertex, false, weight, edgeElement);
         edges.put(edgeElement, newEdge);
         return newEdge;
     }
@@ -182,7 +187,7 @@ class GraphEdgeList<V, E> implements Graph<V, E> {
 
     @Override
     public synchronized Edge<E, V> insertEdge(V vElement1, V vElement2, E edgeElement) throws InvalidVertexException, InvalidEdgeException {
-        return insertEdge(vElement1, vElement2, edgeElement, 1.0);
+        return insertEdge(vElement1, vElement2, edgeElement, getEdgeWeight(edgeElement));
     }
 
     @Override

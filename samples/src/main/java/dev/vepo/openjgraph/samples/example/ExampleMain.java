@@ -95,6 +95,11 @@ public class ExampleMain extends Application {
         graphView.setVertexPosition(newYork, 512, 400);
         
         graphView.getStylableLabel(tokyo).setStyle("-fx-stroke: red; -fx-fill: red;");
+
+        var path = distances.dijkstra(prague, newYork);
+        System.out.println(path);
+
+        graphView.highlight(path);
     }
     
     public static void main(String[] args) {
