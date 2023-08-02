@@ -23,19 +23,16 @@
  */
 package dev.vepo.openjgraph.graph;
 
-import static dev.vepo.openjgraph.graph.ElementInspector.getEdgeWeight;
+import static dev.vepo.openjgraph.graph.ElementInspector.evaluateEdgeWeight;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.collections.api.factory.Maps;
 import org.eclipse.collections.api.map.MutableMap;
-import org.eclipse.collections.api.multimap.Multimap;
 
 /**
  * ADT Graph implementation that stores a collection of edges (and vertices) and
@@ -161,7 +158,7 @@ class GraphEdgeList<V, E> implements Graph<V, E> {
     @Override
     public synchronized Edge<E, V> insertEdge(Vertex<V, E> u, Vertex<V, E> v, E edgeElement)
             throws InvalidVertexException, InvalidEdgeException {
-        return insertEdge(u, v, edgeElement, getEdgeWeight(edgeElement));
+        return insertEdge(u, v, edgeElement, evaluateEdgeWeight(edgeElement));
     }
 
     @Override
@@ -169,21 +166,24 @@ class GraphEdgeList<V, E> implements Graph<V, E> {
             throws InvalidVertexException, InvalidEdgeException {
 
         if (existsEdgeWith(edgeElement)) {
-            throw new InvalidEdgeException("There's already an edge with this element.");
+            throwDuplicatedEdgeException(edgeElement);
         }
 
         Vertex<V, E> outVertex = checkVertex(u);
         Vertex<V, E> inVertex = checkVertex(v);
-        Edge<E, V> newEdge = new Edge<E, V>(outVertex, inVertex, false, weight, edgeElement);
+        var newEdge = new Edge<E, V>(outVertex, inVertex, false, weight, edgeElement);
         edges.put(edgeElement, newEdge);
         return newEdge;
     }
 
+    private void throwDuplicatedEdgeException(E element) {
+        throw new InvalidEdgeException(String.format("There's already an edge with this element. element=%s", element));
+    }
+
     @Override
-    public synchronized Edge<E, V> insertEdge(V vElement1, V vElement2, E edgeElement, double weight)
-            throws InvalidVertexException, InvalidEdgeException { // TODO
+    public synchronized Edge<E, V> insertEdge(V vElement1, V vElement2, E edgeElement, double weight) throws InvalidVertexException, InvalidEdgeException {
         if (existsEdgeWith(edgeElement)) {
-            throw new InvalidEdgeException("There's already an edge with this element.");
+            throwDuplicatedEdgeException(edgeElement);
         }
 
         if (!existsVertexWith(vElement1)) {
@@ -204,7 +204,7 @@ class GraphEdgeList<V, E> implements Graph<V, E> {
     @Override
     public synchronized Edge<E, V> insertEdge(V vElement1, V vElement2, E edgeElement)
             throws InvalidVertexException, InvalidEdgeException {
-        return insertEdge(vElement1, vElement2, edgeElement, getEdgeWeight(edgeElement));
+        return insertEdge(vElement1, vElement2, edgeElement, evaluateEdgeWeight(edgeElement));
     }
 
     @Override
@@ -252,7 +252,7 @@ class GraphEdgeList<V, E> implements Graph<V, E> {
 
         var vertex = checkVertex(v);
         var newVertex = new Vertex<V, E>(newElement, this);
-        V oldElement = vertex.element();
+        var oldElement = vertex.element();
 
         vertices.remove(oldElement);
         vertices.put(newElement, newVertex);
@@ -264,10 +264,10 @@ class GraphEdgeList<V, E> implements Graph<V, E> {
                  edges.remove(e);
                  if (e.vertexA().equals(vertex)) {
                      edges.replace(e.element(),
-                                   new Edge<E, V>(newVertex, e.vertexB(), e.directed(), e.weight(), e.element()));
+                                   new Edge<>(newVertex, e.vertexB(), e.directed(), e.weight(), e.element()));
                  } else {
                      edges.replace(e.element(),
-                                   new Edge<E, V>(e.vertexA(), newVertex, e.directed(), e.weight(), e.element()));
+                                   new Edge<>(e.vertexA(), newVertex, e.directed(), e.weight(), e.element()));
                  }
              });
 
@@ -277,7 +277,7 @@ class GraphEdgeList<V, E> implements Graph<V, E> {
     @Override
     public E replace(Edge<E, V> e, E newElement) throws InvalidEdgeException {
         if (existsEdgeWith(newElement)) {
-            throw new InvalidEdgeException("There's already an edge with this element.");
+            throwDuplicatedEdgeException(newElement);
         }
 
         var edge = checkEdge(e);

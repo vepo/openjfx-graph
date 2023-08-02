@@ -7,7 +7,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ElementInspector {
-    public static <T> double getEdgeWeight(T element) {
+    private ElementInspector() {
+        throw new IllegalStateException("This constructor should never be called!");
+    }
+
+    public static <T> double evaluateEdgeWeight(T element) {
         try {
             Class<?> clazz = element.getClass();
             for (Method method : clazz.getDeclaredMethods()) {

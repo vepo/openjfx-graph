@@ -28,13 +28,10 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 
-import org.eclipse.collections.api.factory.Maps;
 import org.eclipse.collections.api.factory.primitive.IntObjectMaps;
-import org.eclipse.collections.api.map.primitive.IntObjectMap;
 
 /**
  * A graph is made up of a set of vertices connected by edges, where the edges
@@ -55,7 +52,19 @@ public interface Graph<V, E> {
         return new GraphEdgeList<>();
     }
 
-    // http://networksciencebook.com/chapter/3#random-network
+    /**
+     * Generate a random graph.
+     *
+     * @param nodeSize        the total number of vertex
+     * @param edgeProbability a value between 0-1 that represent the probability to generate a edge between two vertex
+     * @param vertexGenerator function to generate vertex object
+     * @param edgeGenerator   function to generate edge object
+     * @param seed            random seed
+     * @param <V>             Vertex class
+     * @param <E>             Edge class
+     * @return
+     * @see <a href="http://networksciencebook.com/chapter/3#random-network">Network Science</a>
+     */
     static <V, E> Graph<V, E> random(int nodeSize,
                                      double edgeProbability,
                                      IntFunction<V> vertexGenerator,
@@ -82,6 +91,18 @@ public interface Graph<V, E> {
         return graph;
     }
 
+    /**
+     * Generate a random graph.
+     *
+     * @param nodeSize        the total number of vertex
+     * @param edgeProbability a value between 0-1 that represent the probability to generate a edge between two vertex
+     * @param vertexGenerator function to generate vertex object
+     * @param edgeGenerator   function to generate edge object
+     * @param <V>             Vertex class
+     * @param <E>             Edge class
+     * @return
+     * @see <a href="http://networksciencebook.com/chapter/3#random-network">Network Science</a>
+     */
     static <V, E> Graph<V, E> random(int nodeSize,
                                      double edgeProbability,
                                      IntFunction<V> vertexGenerator,

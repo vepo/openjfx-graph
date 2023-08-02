@@ -22,7 +22,7 @@ class ElementInspectorTest {
 
     @Test
     void getEdgeWeight() {
-        assertThat(ElementInspector.getEdgeWeight(new RecordPojo("Test", 0.51))).isEqualTo(0.51);
-        assertThat(ElementInspector.getEdgeWeight(new ClassPojo("Test"))).isEqualTo(4.0);
+        assertThat(ElementInspector.evaluateEdgeWeight(new RecordPojo("Test", 0.51))).isEqualTo(0.51);
+        assertThat(ElementInspector.evaluateEdgeWeight(new ClassPojo("Test"))).isEqualTo(4.0);
     }
 }
