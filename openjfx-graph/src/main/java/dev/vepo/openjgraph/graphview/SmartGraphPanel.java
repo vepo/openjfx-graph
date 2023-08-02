@@ -33,11 +33,13 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.nio.file.Paths;
+import java.security.SecureRandom;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
@@ -98,7 +100,6 @@ public class SmartGraphPanel<V, E> extends Pane {
     private Map<Edge<E, V>, Tuple<Vertex<V, E>>> connections;
     private final Map<Tuple<SmartGraphVertexNode>, Integer> placedEdges = new HashMap<>();
     private boolean initialized = false;
-    private final boolean edgesWithArrows;
 
     /*
      * INTERACTION WITH VERTICES AND EDGES
@@ -184,8 +185,6 @@ public class SmartGraphPanel<V, E> extends Pane {
         this.theGraph = theGraph;
         this.graphProperties = properties != null ? properties : new SmartGraphProperties();
         this.placementStrategy = placementStrategy != null ? placementStrategy : new SmartRandomPlacementStrategy();
-
-        this.edgesWithArrows = this.graphProperties.getUseEdgeArrow();
 
         this.repulsionForce = this.graphProperties.getRepulsionForce();
         this.attractionForce = this.graphProperties.getAttractionForce();
@@ -427,7 +426,7 @@ public class SmartGraphPanel<V, E> extends Pane {
                 connections.put(edge, new Tuple<>(vertex, oppositeVertex));
                 addEdge(graphEdge, edge);
 
-                if (this.edgesWithArrows) {
+                if (edge.directed()) {
                     SmartArrow arrow = new SmartArrow(this.graphProperties.getEdgeArrowSize());
                     graphEdge.attachArrow(arrow);
                     this.getChildren().add(arrow);
@@ -512,6 +511,8 @@ public class SmartGraphPanel<V, E> extends Pane {
         }
     }
 
+    private static final Random RANDOM = new SecureRandom();
+
     private void insertNodes() {
         Collection<Vertex<V, E>> unplottedVertices = unplottedVertices();
 
@@ -551,8 +552,7 @@ public class SmartGraphPanel<V, E> extends Pane {
                         y = my;
                     } else {
                         /* TODO: fix -- the placing point can be set out of bounds */
-                        Point2D p = rotate(existing.getPosition().add(50.0, 50.0), existing.getPosition(),
-                                           Math.random() * 360);
+                        var p = rotate(existing.getPosition().add(50.0, 50.0), existing.getPosition(), RANDOM.nextDouble() * 360);
 
                         x = p.getX();
                         y = p.getY();
@@ -593,7 +593,7 @@ public class SmartGraphPanel<V, E> extends Pane {
 
                 var graphEdge = createEdge(edge, graphVertexIn, graphVertexOut);
 
-                if (this.edgesWithArrows) {
+                if (edge.directed()) {
                     SmartArrow arrow = new SmartArrow(this.graphProperties.getEdgeArrowSize());
                     graphEdge.attachArrow(arrow);
                     this.getChildren().add(arrow);
@@ -974,22 +974,23 @@ public class SmartGraphPanel<V, E> extends Pane {
     }
 
     public void highlight(Path<V, E> path) {
+        update();
         vertexNodes.forEach((v, n) -> {
             if (path.contains(v)) {
                 n.addStyleClass("highlight");
-            } else {
-                n.removeStyleClass("highlight");
             }
         });
         edgeNodes.forEach((e, n) -> {
             if (path.contains(e)) {
-                if (path.contains(e)) {
-                    n.addStyleClass("highlight");
-                } else {
-                    n.removeStyleClass("highlight");
-                }
+                n.addStyleClass("highlight");
             }
         });
+        update();
+    }
+
+    public void clearHighlight() {
+        vertexNodes.forEach((v, n)-> n.removeStyleClass("highlight"));
+        edgeNodes.forEach((e, n)-> n.removeStyleClass("highlight"));
         update();
     }
 

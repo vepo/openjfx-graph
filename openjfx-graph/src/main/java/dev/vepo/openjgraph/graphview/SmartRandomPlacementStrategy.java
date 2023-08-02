@@ -23,6 +23,7 @@
  */
 package dev.vepo.openjgraph.graphview;
 
+import java.security.SecureRandom;
 import java.util.Collection;
 import java.util.Random;
 
@@ -37,7 +38,7 @@ import dev.vepo.openjgraph.graph.Graph;
  */
 public class SmartRandomPlacementStrategy implements SmartPlacementStrategy {
 
-    private static final Random RAND = new Random();
+    private static final Random RAND = new SecureRandom();
 
     @Override
     public <V, E> void place(double width, double height, Graph<V, E> theGraph, Collection<? extends SmartGraphVertex<V, E>> vertices) {

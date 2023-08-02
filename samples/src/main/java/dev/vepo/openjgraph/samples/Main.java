@@ -23,6 +23,7 @@
  */
 package dev.vepo.openjgraph.samples;
 
+import java.security.SecureRandom;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -214,7 +215,7 @@ public class Main extends Application {
         return g;
     }
 
-    private static final Random random = new Random(/* seed to reproduce */);
+    private static final Random random = new SecureRandom(/* seed to reproduce */);
 
     private void continuously_test_adding_elements(Graph<String, String> g, SmartGraphPanel<String, String> graphView) {
         // update graph

@@ -39,10 +39,9 @@ import java.util.Optional;
  * <br>
  * Does not allow duplicates of stored elements through <b>equals</b> criteria.
  * <br>
- * 
+ *
  * @param <V> Type of element stored at a vertex
  * @param <E> Type of element stored at an edge
- * 
  * @author brunomnsilva
  */
 class DigraphEdgeList<V, E> implements Digraph<V, E> {
@@ -60,7 +59,9 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
     }
 
     @Override
-    public boolean hasVertex(Vertex<V, E> source) { return vertices.containsValue(source); }
+    public boolean hasVertex(Vertex<V, E> source) {
+        return vertices.containsValue(source);
+    }
 
     @Override
     public synchronized Collection<Edge<E, V>> incidentEdges(Vertex<V, E> inbound) throws InvalidVertexException {
@@ -106,10 +107,13 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
     }
 
     @Override
-    public boolean areAdjacent(V outbound, V inbound) throws InvalidVertexException { return areAdjacent(vertices.get(outbound), vertices.get(inbound)); }
+    public boolean areAdjacent(V outbound, V inbound) throws InvalidVertexException {
+        return areAdjacent(vertices.get(outbound), vertices.get(inbound));
+    }
 
     @Override
-    public synchronized Edge<E, V> insertEdge(Vertex<V, E> outbound, Vertex<V, E> inbound, E edgeElement) throws InvalidVertexException, InvalidEdgeException {
+    public synchronized Edge<E, V> insertEdge(Vertex<V, E> outbound, Vertex<V, E> inbound, E edgeElement)
+            throws InvalidVertexException, InvalidEdgeException {
         return insertEdge(outbound, inbound, edgeElement, getEdgeWeight(edgeElement));
     }
 
@@ -150,24 +154,35 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
     }
 
     @Override
-    public synchronized Edge<E, V> insertEdge(V outboundElement, V inboundElement, E edgeElement) throws InvalidVertexException, InvalidEdgeException {
+    public synchronized Edge<E, V> insertEdge(V outboundElement, V inboundElement, E edgeElement)
+            throws InvalidVertexException, InvalidEdgeException {
         return insertEdge(outboundElement, inboundElement, edgeElement, getEdgeWeight(edgeElement));
     }
 
     @Override
-    public int numVertices() { return vertices.size(); }
+    public int numVertices() {
+        return vertices.size();
+    }
 
     @Override
-    public int numEdges() { return edges.size(); }
+    public int numEdges() {
+        return edges.size();
+    }
 
     @Override
-    public boolean hasEdge(E e) { return existsEdgeWith(e); }
+    public boolean hasEdge(E e) {
+        return existsEdgeWith(e);
+    }
 
     @Override
-    public synchronized Collection<Vertex<V, E>> vertices() { return new ArrayList<>(vertices.values()); }
+    public synchronized Collection<Vertex<V, E>> vertices() {
+        return new ArrayList<>(vertices.values());
+    }
 
     @Override
-    public synchronized Collection<Edge<E, V>> edges() { return new ArrayList<>(edges.values()); }
+    public synchronized Collection<Edge<E, V>> edges() {
+        return new ArrayList<>(edges.values());
+    }
 
     @Override
     public synchronized Vertex<V, E> opposite(Vertex<V, E> v, Edge<E, V> e)
@@ -188,7 +203,9 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
     }
 
     @Override
-    public Vertex<V, E> opposite(V v, E e) throws InvalidVertexException, InvalidEdgeException { return opposite(vertexOf(v), edges.get(e)); }
+    public Vertex<V, E> opposite(V v, E e) throws InvalidVertexException, InvalidEdgeException {
+        return opposite(vertexOf(v), edges.get(e));
+    }
 
     @Override
     public synchronized Vertex<V, E> insertVertex(V vElement) throws InvalidVertexException {
@@ -236,7 +253,8 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
     public Optional<E> removeEdge(V outbound, V inbound) throws InvalidEdgeException {
         return edges.values()
                     .stream()
-                    .filter(edge -> edge.vertexA().element().equals(outbound) && edge.vertexB().element().equals(inbound))
+                    .filter(edge -> edge.vertexA().element().equals(outbound) && edge.vertexB().element()
+                                                                                     .equals(inbound))
                     .findFirst()
                     .map(this::removeEdge);
     }
@@ -260,9 +278,11 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
              .forEach(e -> {
                  edges.remove(e);
                  if (e.vertexA().equals(vertex)) {
-                     edges.replace(e.element(), new Edge<>(newVertex, e.vertexB(), e.directed(), e.weight(), e.element()));
+                     edges.replace(e.element(),
+                                   new Edge<>(newVertex, e.vertexB(), e.directed(), e.weight(), e.element()));
                  } else {
-                     edges.replace(e.element(), new Edge<>(e.vertexA(), newVertex, e.directed(), e.weight(), e.element()));
+                     edges.replace(e.element(),
+                                   new Edge<>(e.vertexA(), newVertex, e.directed(), e.weight(), e.element()));
                  }
              });
 
@@ -286,11 +306,14 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
     }
 
     @Override
-    public Optional<Vertex<V, E>> vertex(V value) { return vertices.containsKey(value) ? Optional.of(vertices.get(value)) : Optional.empty(); }
+    public Optional<Vertex<V, E>> vertex(V value) {
+        return vertices.containsKey(value) ? Optional.of(vertices.get(value)) : Optional.empty();
+    }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(String.format("Graph with %d vertices and %d edges:%n", numVertices(), numEdges()));
+        StringBuilder sb =
+                new StringBuilder(String.format("Graph with %d vertices and %d edges:%n", numVertices(), numEdges()));
 
         sb.append("--- Vertices: \n");
         for (Vertex<V, E> v : vertices.values()) {
@@ -312,16 +335,20 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
         return null;
     }
 
-    private boolean existsVertexWith(V vElement) { return vertices.containsKey(vElement); }
+    private boolean existsVertexWith(V vElement) {
+        return vertices.containsKey(vElement);
+    }
 
-    private boolean existsEdgeWith(E edgeElement) { return edges.containsKey(edgeElement); }
+    private boolean existsEdgeWith(E edgeElement) {
+        return edges.containsKey(edgeElement);
+    }
 
     /**
      * Checks whether a given vertex is valid and belongs to this graph.
      *
      * @param v the vertex to check
      * @return the reference of the vertex, with cast to the underlying
-     *         implementation of {@link Vertex}
+     * implementation of {@link Vertex}
      * @throws InvalidVertexException if the vertex is <code>null</code> or does not
      *                                belong to this graph
      */
@@ -330,18 +357,11 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
             throw new InvalidVertexException("Null vertex.");
         }
 
-        Vertex<V, E> vertex;
-        try {
-            vertex = (Vertex<V, E>) v;
-        } catch (ClassCastException e) {
-            throw new InvalidVertexException("Not a vertex.");
-        }
-
-        if (!vertices.containsKey(vertex.element())) {
+        if (!vertices.containsKey(v.element()) || !v.graph().equals(this)) {
             throw new InvalidVertexException("Vertex does not belong to this graph.");
         }
 
-        return vertex;
+        return vertices.get(v.element());
     }
 
     private Edge<E, V> checkEdge(Edge<E, V> e) throws InvalidEdgeException {
@@ -349,18 +369,11 @@ class DigraphEdgeList<V, E> implements Digraph<V, E> {
             throw new InvalidEdgeException("Null edge.");
         }
 
-        Edge<E, V> edge;
-        try {
-            edge = e;
-        } catch (ClassCastException ex) {
-            throw new InvalidVertexException("Not an adge.");
-        }
-
-        if (!edges.containsKey(edge.element())) {
+        if (!edges.containsKey(e.element()) || !e.vertexA().graph().equals(this)) {
             throw new InvalidEdgeException("Edge does not belong to this graph.");
         }
 
-        return edge;
+        return edges.get(e.element());
     }
 
     public Optional<Edge<E, V>> edge(Vertex<V, E> vertexA, Vertex<V, E> vertexB) {

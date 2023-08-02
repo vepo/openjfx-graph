@@ -9,6 +9,10 @@ import java.util.stream.Stream;
 
 public class Path<V, E> implements Subgraph<V, E> {
 
+    public static <V, E> Path<V, E> startFrom(Vertex<V, E> source) {
+        return new Path<>(source);
+    }
+
     private final Deque<Vertex<V, E>> vertices;
     private final Deque<Edge<E, V>> edges;
 
@@ -19,27 +23,39 @@ public class Path<V, E> implements Subgraph<V, E> {
     }
 
     private Path(Deque<Vertex<V, E>> vertices,
-            Deque<Edge<E, V>> edges) {
+                 Deque<Edge<E, V>> edges) {
         this.vertices = vertices;
         this.edges = edges;
     }
 
-    public Vertex<V, E> tail() { return vertices.peekLast(); }
+    public Vertex<V, E> tail() {
+        return vertices.peekLast();
+    }
 
-    public Set<Vertex<V, E>> vertices() { return new HashSet<>(vertices); }
+    public Set<Vertex<V, E>> vertices() {
+        return new HashSet<>(vertices);
+    }
 
     @Override
-    public boolean contains(Vertex<V, E> vertex) { return vertices.contains(vertex); }
+    public boolean contains(Vertex<V, E> vertex) {
+        return vertices.contains(vertex);
+    }
 
     @Override
-    public boolean contains(Edge<E, V> edge) { return edges.contains(edge); }
+    public boolean contains(Edge<E, V> edge) {
+        return edges.contains(edge);
+    }
 
-    public boolean endsWith(Vertex<V, E> destiny) { return tail().equals(destiny); }
+    public boolean endsWith(Vertex<V, E> destiny) {
+        return tail().equals(destiny);
+    }
 
-    public double distance() { return edges.stream()
-                                           .sequential()
-                                           .mapToDouble(Edge::weight)
-                                           .sum(); }
+    public double distance() {
+        return edges.stream()
+                    .sequential()
+                    .mapToDouble(Edge::weight)
+                    .sum();
+    }
 
     public Stream<Vertex<V, E>> accessibleVertices() {
         var lastVertex = vertices.peekLast();
@@ -52,9 +68,9 @@ public class Path<V, E> implements Subgraph<V, E> {
 
     public Path<V, E> walk(Edge<E, V> edge) {
         Vertex<V, E> tail = tail();
-        if ((edge.directed() && !edge.vertexB().equals(tail)) ||
+        if ((edge.directed() && !edge.vertexA().equals(tail)) ||
                 (!edge.directed() && !edge.contains(tail))) {
-            throw new IllegalStateException("Edge does not incide over tail!");
+            throw new IllegalStateException(String.format("Cannot walk edge %s from %s", edge, tail));
         }
         var newEdges = new LinkedList<>(this.edges);
         var newVertices = new LinkedList<>(this.vertices);
@@ -64,7 +80,9 @@ public class Path<V, E> implements Subgraph<V, E> {
     }
 
     @Override
-    public int hashCode() { return Objects.hash(vertices, edges); }
+    public int hashCode() {
+        return Objects.hash(vertices, edges);
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -79,6 +97,8 @@ public class Path<V, E> implements Subgraph<V, E> {
     }
 
     @Override
-    public String toString() { return String.format("Path[vertices=%s, edges=%s]", vertices, edges); }
+    public String toString() {
+        return String.format("Path[vertices=%s, edges=%s]", vertices, edges);
+    }
 
 }
