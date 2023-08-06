@@ -45,69 +45,100 @@ import org.eclipse.collections.api.factory.primitive.IntObjectMaps;
  */
 public interface Graph<V, E> {
 
+    static <V, E> RandomGraphConfigBuilder<V, E> randomConfig() { return new RandomGraphConfigBuilder<V, E>(); }
+
+    class RandomGraphConfigBuilder<V, E> {
+        private long seed;
+        private int nodeSize;
+        private boolean allowSelfLoop;
+        private double edgeProbability;
+        private IntFunction<V> vertexGenerator;
+        private BiFunction<V, V, E> edgeGenerator;
+
+        private RandomGraphConfigBuilder() { allowSelfLoop = false; }
+
+        public RandomGraphConfigBuilder<V, E> seed(long seed) {
+            this.seed = seed;
+            return this;
+        }
+
+        public RandomGraphConfigBuilder<V, E> nodeSize(int nodeSize) {
+            this.nodeSize = nodeSize;
+            return this;
+        }
+
+        public RandomGraphConfigBuilder<V, E> allowSelfLoop(boolean allowSelfLoop) {
+            this.allowSelfLoop = allowSelfLoop;
+            return this;
+        }
+
+        public RandomGraphConfigBuilder<V, E> edgeProbability(double edgeProbability) {
+            this.edgeProbability = edgeProbability;
+            return this;
+        }
+
+        public RandomGraphConfigBuilder<V, E> vertexGenerator(IntFunction<V> vertexGenerator) {
+            this.vertexGenerator = vertexGenerator;
+            return this;
+        }
+
+        public RandomGraphConfigBuilder<V, E> edgeGenerator(BiFunction<V, V, E> edgeGenerator) {
+            this.edgeGenerator = edgeGenerator;
+            return this;
+        }
+
+        public RandomGraphConfig<V, E> build() {
+            return new RandomGraphConfig<>(nodeSize,
+                                           edgeProbability, vertexGenerator,
+                                           edgeGenerator,
+                                           seed,
+                                           allowSelfLoop);
+        }
+    }
+
+    record RandomGraphConfig<V, E>(int nodeSize,
+                                   double edgeProbability,
+                                   IntFunction<V> vertexGenerator,
+                                   BiFunction<V, V, E> edgeGenerator,
+                                   long seed,
+                                   boolean allowSelfLoop) {}
+
     /**
      * Create a new Graph.
      */
-    static <V, E> Graph<V, E> newGraph() {
-        return new GraphEdgeList<>();
-    }
+    static <V, E> Graph<V, E> newGraph() { return new GraphEdgeList<>(); }
 
     /**
      * Generate a random graph.
      *
-     * @param nodeSize        the total number of vertex
-     * @param edgeProbability a value between 0-1 that represent the probability to generate a edge between two vertex
-     * @param vertexGenerator function to generate vertex object
-     * @param edgeGenerator   function to generate edge object
-     * @param seed            random seed
-     * @param <V>             Vertex class
-     * @param <E>             Edge class
+     * @param config configurações para criar grafo
+     * @param <V>    Vertex class
+     * @param <E>    Edge class
      * @return
-     * @see <a href="http://networksciencebook.com/chapter/3#random-network">Network Science</a>
+     * @see <a href="http://networksciencebook.com/chapter/3#random-network">Network
+     *      Science</a>
      */
-    static <V, E> Graph<V, E> random(int nodeSize,
-                                     double edgeProbability,
-                                     IntFunction<V> vertexGenerator,
-                                     BiFunction<V, V, E> edgeGenerator,
-                                     long seed) {
+    static <V, E> Graph<V, E> random(RandomGraphConfig<V, E> config) {
         var random = new SecureRandom();
-        random.setSeed(seed);
+        random.setSeed(config.seed());
         var graph = Graph.<V, E>newGraph();
         var vertexObjects = IntObjectMaps.mutable.<V>empty();
-        IntStream.range(1, nodeSize + 1)
+        IntStream.range(1, config.nodeSize() + 1)
                  .mapToObj(i -> {
-                     var v = vertexGenerator.apply(i);
+                     var v = config.vertexGenerator().apply(i);
                      vertexObjects.put(i, v);
                      return v;
                  })
                  .forEach(graph::insertVertex);
-        IntStream.range(1, nodeSize + 1)
-                 .forEach(i -> IntStream.range(1, i + 1)
-                                        .filter(j -> random.nextDouble() < edgeProbability)
+        IntStream.range(1, config.nodeSize() + 1)
+                 .forEach(i -> IntStream.range(1, config.allowSelfLoop() ? i + 1 : i)
+                                        .filter(j -> random.nextDouble() < config.edgeProbability())
                                         .forEach(j -> graph.insertEdge(vertexObjects.get(i),
                                                                        vertexObjects.get(j),
-                                                                       edgeGenerator.apply(vertexObjects.get(i),
-                                                                                           vertexObjects.get(j)))));
+                                                                       config.edgeGenerator()
+                                                                             .apply(vertexObjects.get(i),
+                                                                                    vertexObjects.get(j)))));
         return graph;
-    }
-
-    /**
-     * Generate a random graph.
-     *
-     * @param nodeSize        the total number of vertex
-     * @param edgeProbability a value between 0-1 that represent the probability to generate a edge between two vertex
-     * @param vertexGenerator function to generate vertex object
-     * @param edgeGenerator   function to generate edge object
-     * @param <V>             Vertex class
-     * @param <E>             Edge class
-     * @return
-     * @see <a href="http://networksciencebook.com/chapter/3#random-network">Network Science</a>
-     */
-    static <V, E> Graph<V, E> random(int nodeSize,
-                                     double edgeProbability,
-                                     IntFunction<V> vertexGenerator,
-                                     BiFunction<V, V, E> edgeGenerator) {
-        return random(nodeSize, edgeProbability, vertexGenerator, edgeGenerator, 0);
     }
 
     /**
@@ -361,8 +392,8 @@ public interface Graph<V, E> {
      *
      * @param v vertex to remove
      * @return element stored at the removed vertex
-     * @throws InvalidVertexException if <code>v</code> is an invalid vertex for
-     *                                the graph
+     * @throws InvalidVertexException if <code>v</code> is an invalid vertex for the
+     *                                graph
      */
     V removeVertex(Vertex<V, E> v) throws InvalidVertexException;
 
@@ -395,8 +426,8 @@ public interface Graph<V, E> {
      * @param newElement new element to store in <code>v</code>
      * @return previous element previously stored in <code>v</code>
      * @throws InvalidVertexException if the vertex <code>v</code> is invalid for
-     *                                the graph, or; if there already exists
-     *                                another vertex containing the element
+     *                                the graph, or; if there already exists another
+     *                                vertex containing the element
      *                                <code>newElement</code> according to the
      *                                equality of
      *                                {@link Object#equals(java.lang.Object) }
@@ -411,9 +442,9 @@ public interface Graph<V, E> {
      * @param e          edge to replace its element
      * @param newElement new element to store in <code>e</code>
      * @return previous element previously stored in <code>e</code>
-     * @throws InvalidVertexException if the edge <code>e</code> is invalid for
-     *                                the graph, or; if there already exists
-     *                                another edge containing the element
+     * @throws InvalidVertexException if the edge <code>e</code> is invalid for the
+     *                                graph, or; if there already exists another
+     *                                edge containing the element
      *                                <code>newElement</code> according to the
      *                                equality of
      *                                {@link Object#equals(java.lang.Object)}

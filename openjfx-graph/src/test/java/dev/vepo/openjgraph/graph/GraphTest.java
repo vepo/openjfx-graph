@@ -282,10 +282,12 @@ public class GraphTest {
     @Test
     @DisplayName("Random")
     void randomTest() {
-        var graph = Graph.<String, String>random(1000,
-                                                 0.1,
-                                                 i -> String.format("%02d", i),
-                                                 (i, j) -> String.format("%s-%s", i, j));
+        var graph = Graph.<String, String>random(Graph.<String, String>randomConfig()
+                                                      .nodeSize(1000)
+                                                      .edgeProbability(0.1)
+                                                      .vertexGenerator(i -> String.format("%02d", i))
+                                                      .edgeGenerator((i, j) -> String.format("%s-%s", i, j))
+                                                      .build());
         assertEquals(1000, graph.numVertices(), "It should have 1000 vertex");
         assertThat(graph.numEdges()).as("It should have approximately 100 edges")
                                     .isCloseTo((int) ((1000 * 1000 / 2) * 0.1), withPercentage(10));

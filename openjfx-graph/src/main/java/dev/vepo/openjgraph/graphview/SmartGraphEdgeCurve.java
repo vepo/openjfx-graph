@@ -26,7 +26,6 @@ package dev.vepo.openjgraph.graphview;
 import static dev.vepo.openjgraph.graphview.UtilitiesPoint2D.rotate;
 
 import dev.vepo.openjgraph.graph.Edge;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Point2D;
 import javafx.scene.shape.CubicCurve;
 import javafx.scene.transform.Rotate;
