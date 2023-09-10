@@ -27,6 +27,7 @@ import java.security.SecureRandom;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Optional;
+import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
@@ -47,13 +48,15 @@ public interface Graph<V, E> {
 
     static <V, E> RandomGraphConfigBuilder<V, E> randomConfig() { return new RandomGraphConfigBuilder<V, E>(); }
 
+    public static record EdgeInfo<E>(E value, double weight, Map<String, Object> properties) {}
+
     class RandomGraphConfigBuilder<V, E> {
         private long seed;
         private int nodeSize;
         private boolean allowSelfLoop;
         private double edgeProbability;
         private IntFunction<V> vertexGenerator;
-        private BiFunction<V, V, E> edgeGenerator;
+        private BiFunction<V, V, EdgeInfo<E>> edgeGenerator;
 
         private RandomGraphConfigBuilder() { allowSelfLoop = false; }
 
@@ -82,7 +85,7 @@ public interface Graph<V, E> {
             return this;
         }
 
-        public RandomGraphConfigBuilder<V, E> edgeGenerator(BiFunction<V, V, E> edgeGenerator) {
+        public RandomGraphConfigBuilder<V, E> edgeGenerator(BiFunction<V, V, EdgeInfo<E>> edgeGenerator) {
             this.edgeGenerator = edgeGenerator;
             return this;
         }
@@ -99,7 +102,7 @@ public interface Graph<V, E> {
     record RandomGraphConfig<V, E>(int nodeSize,
                                    double edgeProbability,
                                    IntFunction<V> vertexGenerator,
-                                   BiFunction<V, V, E> edgeGenerator,
+                                   BiFunction<V, V, EdgeInfo<E>> edgeGenerator,
                                    long seed,
                                    boolean allowSelfLoop) {}
 
@@ -131,13 +134,20 @@ public interface Graph<V, E> {
                  })
                  .forEach(graph::insertVertex);
         IntStream.range(1, config.nodeSize() + 1)
-                 .forEach(i -> IntStream.range(1, config.allowSelfLoop() ? i + 1 : i)
-                                        .filter(j -> random.nextDouble() < config.edgeProbability())
-                                        .forEach(j -> graph.insertEdge(vertexObjects.get(i),
-                                                                       vertexObjects.get(j),
-                                                                       config.edgeGenerator()
-                                                                             .apply(vertexObjects.get(i),
-                                                                                    vertexObjects.get(j)))));
+                 .forEach(i -> {
+                     IntStream.range(1, config.allowSelfLoop() ? i + 1 : i)
+                              .filter(j -> random.nextDouble() < config.edgeProbability())
+                              .forEach(j -> {
+                                  EdgeInfo<E> info = config.edgeGenerator()
+                                                           .apply(vertexObjects.get(i),
+                                                                  vertexObjects.get(j));
+                                  graph.insertEdge(vertexObjects.get(i),
+                                                   vertexObjects.get(j),
+                                                   info.value(),
+                                                   info.weight(),
+                                                   info.properties());
+                              });
+                 });
         return graph;
     }
 
@@ -327,7 +337,7 @@ public interface Graph<V, E> {
      * @param u           a vertex
      * @param v           another vertex
      * @param edgeElement the element to store in the new edge
-     * @param weight
+     * @param weight      edge weight
      * @return the reference for the newly created edge
      * @throws InvalidVertexException if <code>u</code> or <code>v</code> are
      *                                invalid vertices for the graph
@@ -338,6 +348,27 @@ public interface Graph<V, E> {
      *                                method.
      */
     Edge<E, V> insertEdge(Vertex<V, E> u, Vertex<V, E> v, E edgeElement, double weight)
+            throws InvalidVertexException, InvalidEdgeException;
+
+    /**
+     * Inserts a new edge with a given element between two existing vertices and
+     * return its (the edge's) reference.
+     *
+     * @param u           a vertex
+     * @param v           another vertex
+     * @param edgeElement the element to store in the new edge
+     * @param weight      edge weight
+     * @param properties  element properties
+     * @return the reference for the newly created edge
+     * @throws InvalidVertexException if <code>u</code> or <code>v</code> are
+     *                                invalid vertices for the graph
+     * @throws InvalidEdgeException   if there already exists an edge containing
+     *                                <code>edgeElement</code> according to the
+     *                                equality of
+     *                                {@link Object#equals(java.lang.Object) }
+     *                                method.
+     */
+    Edge<E, V> insertEdge(Vertex<V, E> u, Vertex<V, E> v, E edgeElement, double weight, Map<String, Object> properties)
             throws InvalidVertexException, InvalidEdgeException;
 
     /**
@@ -362,6 +393,31 @@ public interface Graph<V, E> {
      *                                method.
      */
     Edge<E, V> insertEdge(V vElement1, V vElement2, E edgeElement, double weight)
+            throws InvalidVertexException, InvalidEdgeException;
+
+    /**
+     * Inserts a new edge with a given element between two existing vertices and
+     * return its (the edge's) reference.
+     *
+     * @param vElement1   a vertex's stored element
+     * @param vElement2   another vertex's stored element
+     * @param edgeElement the element to store in the new edge
+     * @param properties  element properties
+     * @param weight
+     * @return the reference for the newly created edge
+     * @throws InvalidVertexException if <code>vElement1</code> or
+     *                                <code>vElement2</code> are not found in any
+     *                                vertices of the graph according to the
+     *                                equality of
+     *                                {@link Object#equals(java.lang.Object) }
+     *                                method.
+     * @throws InvalidEdgeException   if there already exists an edge containing
+     *                                <code>edgeElement</code> according to the
+     *                                equality of
+     *                                {@link Object#equals(java.lang.Object) }
+     *                                method.
+     */
+    Edge<E, V> insertEdge(V vElement1, V vElement2, E edgeElement, double weight, Map<String, Object> properties)
             throws InvalidVertexException, InvalidEdgeException;
 
     /**

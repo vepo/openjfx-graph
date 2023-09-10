@@ -9,10 +9,13 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import dev.vepo.openjgraph.graph.Graph.EdgeInfo;
 
 public class GraphTest {
 
@@ -186,13 +189,13 @@ public class GraphTest {
         assertThatThrownBy(() -> graph.insertEdge("B", "X", "B - X")).isInstanceOf(InvalidVertexException.class);
         assertThatThrownBy(() -> graph.insertEdge(null, "X", "B - X")).isInstanceOf(InvalidVertexException.class);
         assertThatThrownBy(
-                () -> graph.insertEdge(new Vertex<>("X", graph), new Vertex<>("C", graph), "X- B")).isInstanceOf(
-                InvalidVertexException.class);
+                           () -> graph.insertEdge(new Vertex<>("X", graph), new Vertex<>("C", graph), "X- B")).isInstanceOf(
+                                                                                                                            InvalidVertexException.class);
         assertThatThrownBy(
-                () -> graph.insertEdge(new Vertex<>("B", graph), new Vertex<>("X", graph), "B - X")).isInstanceOf(
-                InvalidVertexException.class);
+                           () -> graph.insertEdge(new Vertex<>("B", graph), new Vertex<>("X", graph), "B - X")).isInstanceOf(
+                                                                                                                             InvalidVertexException.class);
         assertThatThrownBy(() -> graph.insertEdge(null, new Vertex<>("X", graph), "B - X")).isInstanceOf(
-                InvalidVertexException.class);
+                                                                                                         InvalidVertexException.class);
     }
 
     @Test
@@ -286,7 +289,7 @@ public class GraphTest {
                                                       .nodeSize(1000)
                                                       .edgeProbability(0.1)
                                                       .vertexGenerator(i -> String.format("%02d", i))
-                                                      .edgeGenerator((i, j) -> String.format("%s-%s", i, j))
+                                                      .edgeGenerator((i, j) -> new EdgeInfo<>(String.format("%s-%s", i, j), 1.0, Collections.emptyMap()))
                                                       .build());
         assertEquals(1000, graph.numVertices(), "It should have 1000 vertex");
         assertThat(graph.numEdges()).as("It should have approximately 100 edges")

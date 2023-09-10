@@ -23,6 +23,8 @@
  */
 package dev.vepo.openjgraph.graph;
 
+import java.util.Map;
+
 /**
  * An edge connects two {@link Vertex} of type <code>V</code> and stores an
  * element of type <code>E</code>. <br/>
@@ -38,7 +40,8 @@ public record Edge<E, V>(Vertex<V, E> vertexA,
                          Vertex<V, E> vertexB,
                          boolean directed,
                          double weight,
-                         E element) {
+                         E element,
+                         Map<String, Object> properties) {
 
     public boolean contains(Vertex<V, E> vertex) { return vertexA.equals(vertex) || vertexB.equals(vertex); }
 

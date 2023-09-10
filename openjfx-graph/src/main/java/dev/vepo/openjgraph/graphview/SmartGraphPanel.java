@@ -808,15 +808,13 @@ public class SmartGraphPanel<V, E> extends Pane {
     }
 
     private void applyForces() {
-        vertexNodes.values().forEach((v) -> {
-            v.moveFromForces();
-        });
+        vertexNodes.values()
+                   .forEach(SmartGraphVertexNode::moveFromForces);
     }
 
     private void resetForces() {
-        vertexNodes.values().forEach((v) -> {
-            v.resetForces();
-        });
+        vertexNodes.values()
+                   .forEach(SmartGraphVertexNode::resetForces);
     }
 
     private int getTotalEdgesBetween(Vertex<V, E> v, Vertex<V, E> u) {
@@ -833,19 +831,11 @@ public class SmartGraphPanel<V, E> extends Pane {
     }
 
     private List<Edge<E, V>> listOfEdges() {
-        List<Edge<E, V>> list = new LinkedList<>();
-        for (Edge<E, V> edge : theGraph.edges()) {
-            list.add(edge);
-        }
-        return list;
+        return new LinkedList<>(theGraph.edges());
     }
 
     private List<Vertex<V, E>> listOfVertices() {
-        List<Vertex<V, E>> list = new LinkedList<>();
-        for (Vertex<V, E> vertex : theGraph.vertices()) {
-            list.add(vertex);
-        }
-        return list;
+        return new LinkedList<>(theGraph.vertices());
     }
 
     /**
